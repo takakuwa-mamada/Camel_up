@@ -1,34 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
     <head>
-        <link rel="stylesheet" href="camelup.css">
+        <meta charset="UTF-8">
+        <title>B3横山研</title>
+
+        <link rel="stylesheet" href="B3-css/B3-camelup.css">
+        <script src="B3-js/B3-camelup.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     </head>
     <body>
-        <div class="point_box">
-            <div class="left">
-                <p>Player1<br>Player2<br>Player3<br>Player4
-                </p>
+        <div id="app">
+            <div class="top">
+                <table class="point"> <!--得点欄-->
+                    <tr>
+                        <td class="turn">・</td>
+                        <td class="name">player 1</td>
+                        <td class="money">10 コイン</td>
+                    </tr>
+                    <tr>
+                        <td class="turn">・</td>
+                        <td class="name">player 2</td>
+                        <td class="money">3 コイン</td>
+                    </tr>
+                    <tr>
+                        <td class="turn">・</td>
+                        <td class="name">player 3</td>
+                        <td class="money">8 コイン</td>
+                    </tr>
+                    <tr>
+                        <td class="turn">・</td>
+                        <td class="name">player 4</td>
+                        <td class="money">15 コイン</td>
+                    </tr>
+                </table> 
+                <div class="ticket"> <!--投票チケット欄-->
+                    <p class="boxtitle">投票チケット</p>
+                    <div class="color_ticket">
+                        <div class="red_ticket">
+                            <p>残り枚数： 3</p>
+                            <p>next...</p>
+                            <p>1位　3 コイン</p>
+                        </div>
+                        <div class="blue_ticket">
+                            <p>残り枚数： 1</p>
+                            <p>next...</p>
+                            <p>1位　2 コイン</p>
+                        </div>
+                        <div class="yellow_ticket">
+                            <p>残り枚数： 2</p>
+                            <p>next...</p>
+                            <p>1位　2 コイン</p>
+                        </div>
+                        <div class="green_ticket">
+                            <p>残り枚数： 3</p>
+                            <p>next...</p>
+                            <p>1位　3 コイン</p>
+                        </div>
+                        <div class="purple_ticket">
+                            <p>残り枚数： 4</p>
+                            <p>next...</p>
+                            <p>1位　5 コイン</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dice"> <!--残りのサイコロ欄-->
+                    <p class="boxtitle">残りのサイコロ</p>
+                    <div class="remain_dice">
+                        <div class="remain_dice_red"></div>
+                        <div class="remain_dice_blue"></div>
+                        <div class="remain_dice_yellow"></div>
+                        <div class="remain_dice_green"></div>
+                        <div class="remain_dice_purple"></div>
+                        <div class="remain_dice_gray"></div>
+                    </div>
+                </div>
+                <div class="forecast"> <!--予想欄-->
+                    <div class="first_camel">
+                        <p>1位予想</p>
+                        <div class="card_count">
+                            <p>3</p>
+                        </div>
+                    </div>
+                    <div class="lowest_camel">
+                        <p>最下位予想</p>
+                        <div class="card_count">
+                            <p>1</p>
+                        </div>
+                    </div>
+                    <div class="my_forecast">
+                        <p>自分の予想</p>
+                        <div class="my_forecast_box">
+                            <p>・1位予想1枚目　緑</p>
+                            <p>・最下位予想3枚目　赤</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="right">
-                <p>0<br>0<br>0<br>0
-                </p>
+            <div class="bottom">
+                <div class="stage"> <!--盤面-->
+                    <div class="log"> <!--ログ-->
+                        <p>・player 1がサイコロを振りました</p>
+                        <p>・黄ラクダが2進みました</p>
+                    </div>
+                    <div class="camel_root">
+                        <!--マス目-->
+                        <div v-for="(mass, index) in cells" class="mass" :key="index">
+                            <p>{{mass}}</p>
+                        </div> 
+                        <!--駒-->
+                        <div v-for="(camel, camel_index) in camels" :key="camel_index" 
+                             class="camel" 
+                             :style="CamelPosition(camel)">
+                        </div>
+                    </div>
+                    <div class="command">
+                        <p>▶サイコロをふる</p>
+                        <p>▶順位予想をする</p>
+                        <p>▶観客タイルを置く</p>
+                        <p>▶投票チケットをとる</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="leg_box">
-            <p>レグごとの予想置き場
-            </p>
-        </div>
-        <div class="dice_box">
-            <p>なんのサイコロがでているか入力
-            </p>
-        </div>
-        <div class="game_box">
-            <p>ゲーム全体の賭け置き場
-            </p>
-        </div>
-        <div class="board">
-            <p>test
-            </p>
         </div>
     </body>
 </html>
