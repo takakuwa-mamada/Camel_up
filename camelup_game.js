@@ -275,7 +275,7 @@ function move(cam, n){
         aboveCam = cam.above;
         while(aboveCam != null){
             aboveCam.location += n;
-            if(cam.location = 17){
+            if(cam.location == 17){
                 aboveCam.location = 17;
             }
             aboveCam.layer = aboveCam.below.layer + 1;
