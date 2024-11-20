@@ -1,13 +1,14 @@
-//version 1.0.0
+//version 1.0.1
 /*
 「」はフローチャートに対応
 
---実装した機能--
+--1.0.0までに実装した機能--
 ・最初に3EP配布
 ・最終予想カードの配布
 ・競争ラクダ
 ・プレイヤーの手番選択（最終予想orダイス）
 ・最終予想（「レース全体の勝者か敗者に投票」）
+・ダイス選択時に1EP獲得（ピラミッドチケットは無し）
 ・１つのレグで被らないようにダイスを振る
 ・ダイスに応じたラクダの移動（重なりなし）
 ・手番のループ
@@ -15,16 +16,26 @@
 ・レグの終了判定
 ・ゲームの終了判定
 
+--1.0.1で実装した機能--
+・ダイス選択時に1EP獲得（ピラミッドチケットは無し）
+・スペース、トラックの作成
+・camel クラスに情報追加　layer, above, below
+・playerクラス piramid_ticketの削除
+・変数 topCamel, bottomCamel の追加（全体の一位と最下位）
+・関数 move の追加
+・ラクダの重なり
+・重なったラクダの移動
+
+
 
 --未実装の機能--
 ・通信機能
 ・プレイヤーの参加
-・各チケットの配置（投票、ピラミッド）
+・ゲームの開始
+・投票チケットの配置
 ・観客タイルの配布
-・ラクダの重なり
 ・イカれたラクダ、灰ダイス
 ・プレイヤーの手番選択（タイル設置orレグの投票）
-・ピラミッドチケットの入手
 ・灰ダイス時の動かすラクダの判定
 ・逆走時の移動
 ・タイルを踏んだ時の動作（応援面、ブーイング面）
@@ -39,6 +50,31 @@
 
 
 
+//スペース
+class space{
+    constructor(num){
+        this.num = num;     //スペースの番号
+    }
+    top = null;         //スペースにいるラクダの最上段
+    bottom = null;      //スペースにいるラクダの最下段
+    count = 0;          //スペースにいるラクダの数
+}
+
+
+//トラック
+const track = new Array;
+s0 = new space(0); track.push(s0); s1 = new space(1); track.push(s1);
+s2 = new space(2); track.push(s2); s3 = new space(3); track.push(s3);
+s4 = new space(4); track.push(s4); s5 = new space(5); track.push(s5);
+s6 = new space(6); track.push(s6); s7 = new space(7); track.push(s7);
+s8 = new space(8); track.push(s8); s9 = new space(9); track.push(s9);
+s10 = new space(10); track.push(s10); s11 = new space(11); track.push(s11);
+s12 = new space(12); track.push(s12); s13 = new space(13); track.push(s13);
+s14 = new space(14); track.push(s14); s15 = new space(15); track.push(s15);
+s16 = new space(16); track.push(s16); s17 = new space(17); track.push(s17);
+s18 = new space(18); track.push(s18); s19 = new space(19); track.push(s19);
+
+
 
 //ラクダ
 class camel{
@@ -46,7 +82,10 @@ class camel{
         this.color = color;     //色
         this.type = type;       //種類　0:競争ラクダ　1:イカれたラクダ
     }
-    location = 0;           //ラクダの位置
+    location = 0;   //ラクダの位置
+    layer = 1;      //ラクダ集団での位置　下から1
+    above = null;       //上にいるラクダ
+    below = null;       //下にいるラクダ
 }
 
 //競争ラクダ
@@ -81,9 +120,8 @@ class player{
     constructor(name){
         this.name = name;
     }
-    order;      //順番 
+    order=0;      //順番 
     EP = 3;     //所持金　最初に3EP配布される
-    pyramid_ticket = 0;     //所持しているピラミッドチケット
     race_card = ["red", "blue", "yellow", "green", "purple"]; //所持している最終投票カード
 }
 
@@ -103,6 +141,8 @@ const topVote = [];         //全体の一位投票
 const bottomVote = [];      //全体の最下位予想
 const players = [];         //ゲームの参加者
 let startPlayerMarker = 0;  //手番プレイヤー
+let topCamel=null;          //一位
+let bottomCamel=null;       //最下位
 
 //ゲーム全体の実行
 function game(){
@@ -114,12 +154,14 @@ function game(){
     setCamel();
 
     //レグのループ
+
     var goal = 0;
     while(goal==0){
         console.log("=========================================");
         goal = leg();
         //legPoint();
     }
+
     //legPoint();
     //gamepoint();
     //ranking();
@@ -130,7 +172,7 @@ function game(){
     //ラクダの最終位置
     for(let i=0; i<camels.length; i++){
         c = camels[i];
-        console.log(c.color, c.location);
+        console.log(c.color, c.location, c.layer);
     }
     //全体の１位の投票
     for(let i=0; i<topVote.length; i++){
@@ -142,6 +184,12 @@ function game(){
         b = bottomVote[i]
         console.log("bottom: ",b.name.name, b.color);
     }
+    //プレイヤーの獲得金額
+    for(let i=0; i<players.length; i++){
+        p = players[i];
+        console.log(p.name, p.EP);
+    }
+
 
 }
 
@@ -170,12 +218,73 @@ function setCamel(){
         //ダイスと同じ色のラクダを動かす
         for(let k=0; k<camels.length; k++){
             if(camels[k].color==startDice[j]){
-                camels[k].location = n;
-            }   
+                move(camels[k], n);
+            }
         }
+
+
         //出たダイスを取り除く
         startDice.splice(j,1);
     }
+}
+
+
+
+//ラクダ集団の移動
+function move(cam, n){
+    //移動前のスペースの整理
+    track[cam.location].count = cam.layer-1;
+    track[cam.location].top = cam.below;
+    //下にラクダがいない場合
+    if(cam.below == null){
+        track[cam.location].bottom = null;
+    }
+    //下にラクダがいる場合
+    else{
+        cam.below.above = null;
+    }
+
+
+    //移動
+    cam.location += n;
+    //ゴールした場合
+    if(cam.location > 16){
+        cam.location = 17;
+    }
+
+
+    //移動先のスペースの整理
+    track[cam.location].count += 1;
+    //移動先にラクダがいない場合
+    if(track[cam.location].count==1){
+        track[cam.location].top = cam;
+        track[cam.location].bottom = cam;
+        cam.below = null;
+        cam.layer = 1;
+    }
+    //移動先にラクダがいる場合
+    else{
+        cam.below = track[cam.location].top;
+        track[cam.location].top.above = cam;
+        track[cam.location].top = cam;
+        cam.layer = cam.below.layer + 1;
+    }
+
+    //移動するラクダの上にラクダがいる場合
+    if(cam.above != null){
+        aboveCam = cam.above;
+        while(aboveCam != null){
+            aboveCam.location += n;
+            if(cam.location = 17){
+                aboveCam.location = 17;
+            }
+            aboveCam.layer = aboveCam.below.layer + 1;
+            track[cam.location].count += 1;
+            track[cam.location].top = aboveCam;
+            aboveCam = aboveCam.above;
+        }
+    }
+    
 }
 
 
@@ -187,7 +296,7 @@ function leg(){
     //レグ開始時のラクダの位置
     for(let i=0; i<camels.length; i++){
         c = camels[i];
-        console.log(c.color, c.location);
+        console.log(c.color, c.location, c.layer);
     }
 
     //プレイヤーの手番
@@ -231,6 +340,10 @@ function leg(){
         //ダイスを振る
         if(choice != 0){
             console.log("rollDice");
+
+            //ピラミッドチケットは無し　選択してすぐに1EP獲得
+            players[startPlayerMarker].EP+=1;
+
             //色と目の決定
             var c = Math.floor(Math.random()*restDice.length);
             var col = restDice[c];
@@ -245,10 +358,10 @@ function leg(){
             //ラクダの移動
             for(let k=0; k<camels.length; k++){
                 if(camels[k].color==col){
-                    camels[k].location += n;
+                    move(camels[k], n);
                     
                     //ゴール(16を越える)したら終了
-                    if(camels[k].location>16){
+                    if(camels[k].location==17){
                         return 1;
                     }
                 }
