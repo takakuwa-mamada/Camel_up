@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>B3横山研</title>
 
-        <link rel="stylesheet" href="camelup.css">
+        <link rel="stylesheet" href="B3-camelup.css">
         <script src="camelup.js" defer></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     </head>
@@ -13,65 +13,63 @@
             <div class="top">
                 <table class="point"> <!--得点欄-->
                     <tr>
-                        <td class="turn">・</td>
+                        <td v-if="playerturn === 1" class="turn">・</td>
+                        <td v-if="playerturn !== 1" class="turn"> </td>
                         <td class="name">player 1</td>
                         <td class="money">10 コイン</td>
+                        <td><img src="ticket_box.png"></td>
                     </tr>
                     <tr>
-                        <td class="turn">・</td>
+                        <td v-if="playerturn === 2" class="turn">・</td>
+                        <td v-if="playerturn !== 2" class="turn"> </td>
                         <td class="name">player 2</td>
                         <td class="money">3 コイン</td>
+                        <td><img src="ticket_box.png"></td>
                     </tr>
                     <tr>
-                        <td class="turn">・</td>
+                        <td v-if="playerturn === 3" class="turn">・</td>
+                        <td v-if="playerturn !== 3" class="turn"> </td>
                         <td class="name">player 3</td>
                         <td class="money">8 コイン</td>
+                        <td><img src="ticket_box.png"></td>
                     </tr>
                     <tr>
-                        <td class="turn">・</td>
+                        <td v-if="playerturn === 4" class="turn">・</td>
+                        <td v-if="playerturn !== 4" class="turn"> </td>
                         <td class="name">player 4</td>
                         <td class="money">15 コイン</td>
+                        <td><img src="ticket_box.png"></td>
                     </tr>
                 </table> 
                 <div class="ticket"> <!--投票チケット欄-->
                     <p class="boxtitle">投票チケット</p>
                     <div class="color_ticket">
                         <div class="red_ticket">
-                            <p>残り枚数： 3</p>
-                            <p>next...</p>
-                            <p>1位　3 コイン</p>
+                            <img v-for="(redticket, redticket_index) in tickets[0]" v-if="redticket_index === ticket_flag[0]-1" :key="redticket_index" :src="redticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[0]}}枚</p>
                         </div>
                         <div class="blue_ticket">
-                            <p>残り枚数： 1</p>
-                            <p>next...</p>
-                            <p>1位　2 コイン</p>
-                        </div>
-                        <div class="yellow_ticket">
-                            <p>残り枚数： 2</p>
-                            <p>next...</p>
-                            <p>1位　2 コイン</p>
+                            <img v-for="(blueticket, blueticket_index) in tickets[1]" v-if="blueticket_index === ticket_flag[1]-1" :key="blueticket_index" :src="blueticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[1]}}枚</p>
                         </div>
                         <div class="green_ticket">
-                            <p>残り枚数： 3</p>
-                            <p>next...</p>
-                            <p>1位　3 コイン</p>
+                            <img v-for="(greenticket, greenticket_index) in tickets[2]" v-if="greenticket_index === ticket_flag[2]-1" :key="greenticket_index" :src="greenticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[2]}}枚</p>
+                        </div>
+                        <div class="yellow_ticket">
+                            <img v-for="(yellowticket, yellowticket_index) in tickets[3]" v-if="yellowticket_index === ticket_flag[3]-1" :key="yellowticket_index" :src="yellowticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[3]}}枚</p>
                         </div>
                         <div class="purple_ticket">
-                            <p>残り枚数： 4</p>
-                            <p>next...</p>
-                            <p>1位　5 コイン</p>
+                            <img v-for="(purpleticket, purpleticket_index) in tickets[4]" v-if="purpleticket_index === ticket_flag[4]-1" :key="purpleticket_index" :src="purpleticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[4]}}枚</p>
                         </div>
                     </div>
                 </div>
                 <div class="dice"> <!--残りのサイコロ欄-->
                     <p class="boxtitle">残りのサイコロ</p>
                     <div class="remain_dice">
-                        <div class="remain_dice_red"></div>
-                        <div class="remain_dice_blue"></div>
-                        <div class="remain_dice_yellow"></div>
-                        <div class="remain_dice_green"></div>
-                        <div class="remain_dice_purple"></div>
-                        <div class="remain_dice_gray"></div>
+                        <img v-for="(remaindice, dice_index) in remaindices" v-if="dice_flag[dice_index] === 0" :key="dice_index" :src="remaindice.image" alt="dice" class="dice_picture">
                     </div>
                 </div>
                 <div class="forecast"> <!--予想欄-->
@@ -87,13 +85,6 @@
                             <p>1</p>
                         </div>
                     </div>
-                    <div class="my_forecast">
-                        <p>自分の予想</p>
-                        <div class="my_forecast_box">
-                            <p>・1位予想1枚目　緑</p>
-                            <p>・最下位予想3枚目　赤</p>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="bottom">
@@ -107,17 +98,37 @@
                         <div v-for="(mass, index) in cells" class="mass" :key="index">
                             <p>{{mass}}</p>
                         </div> 
+                        <div class="goaltape">
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                            <div class="whitetape"></div>
+                            <div class="blacktape"></div>
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                            <div class="whitetape"></div>
+                            <div class="blacktape"></div>
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                        </div>
                         <!--駒-->
                         <div v-for="(camel, camel_index) in camels" :key="camel_index" 
                              class="camel" 
                              :style="CamelPosition(camel)">
                         </div>
                     </div>
-                    <div class="command">
-                        <p>▶サイコロをふる</p>
-                        <p>▶順位予想をする</p>
-                        <p>▶観客タイルを置く</p>
-                        <p>▶投票チケットをとる</p>
+                    <div  class="command_place"><!--v-if="playerturn === 1"-->
+                        <div  v-for="(command, command_index) in commands[0]" v-if="command_flag === 0" class="command" :key="command_index">
+                            <p @click="CommandClick(command)">{{command.word}}</p>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[1]" v-if="command_flag === 4 || (command_flag === 1 && ticket_flag[command_index] !== 0)" class="command" :key="command_index">
+                            <p @click="CommandClick(command)">{{command.word}}</p>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[2]" v-if="command_flag === 2" class="command" :key="command_index">
+                            <p @click="CommandClick(command)">{{command.word}}</p>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[3]" v-if="command_flag === 3" class="command" :key="command_index">
+                            <p @click="CommandClick(command)">{{command.word}}</p>
+                        </div>
                     </div>
                 </div>
             </div>
