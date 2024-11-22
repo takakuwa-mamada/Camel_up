@@ -1,29 +1,24 @@
-//version 1.1.0
+//version 1.2.0
 /*
 「」はフローチャートに対応
 
---1.0.0までに実装した機能--
+--1.1.0までに実装した機能--
+・ゲームボードの要素
 ・最初に3EP配布
 ・最終予想カードの配布
 ・競争ラクダ
 ・プレイヤーの手番選択（最終予想orダイス）
 ・最終予想（「レース全体の勝者か敗者に投票」）
+・ダイス選択時に1EP獲得（ピラミッドチケットは無し）
 ・１つのレグで被らないようにダイスを振る
-・ダイスに応じたラクダの移動（重なりなし）
+・ダイスに応じたラクダ集団の移動
 ・手番のループ
 ・レグのループ
 ・レグの終了判定
 ・ゲームの終了判定
 
---1.1.0で実装した機能--
-・ダイス選択時に1EP獲得（ピラミッドチケットは無し）
-・space、trackの作成
-・camel クラスに情報追加　layer, above, below
-・playerクラス piramid_ticketの削除
-・変数 topCamel, bottomCamel の追加（全体の一位と最下位）
-・関数 move の追加
-・ラクダの重なり
-・重なったラクダの移動
+--1.2.0で実装した機能--
+・「ゲーム終了時の得点ラウンド」
 
 
 
@@ -43,8 +38,8 @@
 ・レグの投票（「投票チケットを１枚取る」）
 ・「盤面の整理」
 ・「レグの得点ラウンド」
-・「ゲーム終了時の得点ラウンド」
 ・勝者判定
+・EPがマイナスにならないようにする
 */
 
 
@@ -140,8 +135,6 @@ const topVote = [];         //全体の一位投票
 const bottomVote = [];      //全体の最下位予想
 const players = [];         //ゲームの参加者
 let startPlayerMarker = 0;  //手番プレイヤー
-let topCamel=null;          //一位
-let bottomCamel=null;       //最下位
 
 //ゲーム全体の実行
 function game(){
@@ -161,9 +154,7 @@ function game(){
         //legPoint();
     }
 
-    //legPoint();
-    //gamepoint();
-    //ranking();
+
 
     //ゲーム終了
     console.log("###############################");
@@ -173,6 +164,16 @@ function game(){
         c = camels[i];
         console.log(c.color, c.location, c.layer);
     }
+
+    //プレイヤーの獲得金額
+    for(let i=0; i<players.length; i++){
+        p = players[i];
+        console.log(p.name, p.EP);
+    }
+    //legPoint();
+    gamepoint();
+    //ranking();
+
     //全体の１位の投票
     for(let i=0; i<topVote.length; i++){
         t = topVote[i];
@@ -385,7 +386,76 @@ function legPoint(){
 }
 
 function gamepoint(){
+    topCamel = redCam;      //全体の一位
+    bottomCamel = redCam;   //全体の最下位
 
+    //一位と最下位の決定
+    for(let i=1; i<4; i++){
+        //一位
+        if(camels[i].location > topCamel.location){
+            topCamel = camels[i];
+        }else if(camels[i].location == topCamel.location){
+            if(camels[i].layer > topCamel.layer){
+                topCamel = camels[i];
+            }
+        }
+
+        //最下位
+        if(camels[i].location < bottomCamel.location){
+            bottomCamel = camels[i];
+        }else if(camels[i].location == bottomCamel.location){
+            if(camels[i].layer < bottomCamel.layer){
+                bottomCamel = camels[i];
+            }
+        }        
+    }
+    topColor = topCamel.color;          //一位の色
+    bottomColor = bottomCamel.color;    //最下位の色
+
+    console.log("topColor:", topColor);
+    console.log("bottomColor:", bottomColor);
+
+    //一位の投票の賞金
+    var count=0;
+    for(let i=0; i<topVote.length; i++){
+        if(topVote[i].color == topColor){
+            if(count==0){
+                topVote[i].name.EP += 8;
+            }else if(count==1){
+                topVote[i].name.EP += 5;
+            }else if(count==2){
+                topVote[i].name.EP += 3;
+            }else if(count==3){
+                topVote[i].name.EP += 2;
+            }else if(count==4){
+                topVote[i].name.EP += 1;
+            }
+            count += 1;
+        }else{
+            topVote[i].name.EP -= 1;
+        }
+    }
+
+    //最下位の投票の賞金
+    count=0;
+    for(let i=0; i<bottomVote.length; i++){
+        if(bottomVote[i].color == bottomColor){
+            if(count==0){
+                bottomVote[i].name.EP += 8;
+            }else if(count==1){
+                bottomVote[i].name.EP += 5;
+            }else if(count==2){
+                bottomVote[i].name.EP += 3;
+            }else if(count==3){
+                bottomVote[i].name.EP += 2;
+            }else if(count==4){
+                bottomVote[i].name.EP += 1;
+            }
+            count += 1;
+        }else{
+            bottomVote[i].name.EP -= 1;
+        }
+    }
 }
 
 function ranking(){
