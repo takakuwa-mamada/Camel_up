@@ -13,20 +13,38 @@ body{
 
 .point{
     width:250px;
-    height: 100px;
+    height: 120px;
     border: solid 1px #000;
     text-align: center;
     background: #ffd373;
 }
 
-.turn, .name, .money{
-    padding: 2px 1px;
+
+.point td{
     border-top: solid 1px #000;
+    vertical-align:middle;
+}
+
+.turn{
+    width: 10%;
+}
+
+.name{
+    width: 40%;
+}
+
+.money{
+    width: 35%;
+}
+
+.point img{
+    width: 70%;
+    height: auto;
 }
 
 .ticket{
-    width: 600px;
-    height: 100px;
+    width: 400px;
+    height: 120px;
     border: solid 1px #000;
     background: #ffd373;
 
@@ -44,36 +62,42 @@ body{
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    align-items: center;
 }
 
 .color_ticket > div{
-    width: 110px;
+    width: 55px;
     height: 65px;
+    position: relative;
+    overflow: visible;
 }
 
-.red_ticket{
-    border: solid 1px #f00;
+.color_ticket > div p{
+    position: absolute;
+    top: 80px;
+    font-size: small;
 }
 
-.blue_ticket{
-    border: solid 1px #00f;
+
+.ticket_picture{
+    width: 100%;
+    height: auto;
+    position: absolute;
+    display: block;
+    transition-duration: 0.5s;
+    z-index: 1;
 }
 
-.yellow_ticket{
-    border: solid 1px #ff0;
-}
-
-.green_ticket{
-    border: solid 1px #0f0;
-}
-
-.purple_ticket{
-    border: solid 1px rgb(200, 0, 255);
+.ticket_picture:hover{
+    transform: scale(2.5, 2.5);
+    transition-duration: 0.5s;
+    top: 10%;
+    z-index: 2;
 }
 
 .dice{
     width: 150px;
-    height: 100px;
+    height: 120px;
     border: solid 1px #000;
     background: #ffd373;
 
@@ -88,42 +112,18 @@ body{
     flex-wrap: wrap;
     justify-content: space-evenly;
     align-items: center;
-    margin-top: 5px;
-    gap: 16.5px;
+    margin-top: 15px;
+    gap: 10px;
 }
 
-.remain_dice > div{
-    width: 25px;
-    height: 25px;
-}
-
-.remain_dice_red{
-    background   : #f00;
-}
-
-.remain_dice_blue{
-    background   : #00f;
-}
-
-.remain_dice_yellow{
-    background   : #ff0;
-}
-
-.remain_dice_green{
-    background   : #0f0;
-}
-
-.remain_dice_purple{
-    background   : rgb(200, 0, 255);
-}
-
-.remain_dice_gray{
-    background   : #808080;
+.dice_picture{
+    width: 20%;
+    height: auto;
 }
 
 .forecast{
     width: 300px;
-    height: 100px;
+    height: 120px;
     border: solid 1px #000;
     background: #ffd373;
     display: flex;
@@ -164,7 +164,7 @@ body{
 
 .log{
     width: 500px;
-    height: 160px;
+    height: 200px;
     border: solid 1px #000;
     background-color: rgba(0, 255, 242, 0.3);
     margin:0 0 0 auto;
@@ -183,13 +183,15 @@ body{
     width: 95%;
     height: 130px;
     position: relative;
+    left: 10px;
 }
 
 .mass{
     border: 1px solid black;
     background-color: greenyellow;
-    width: 83px;
-    height: 83px;
+    width: 80px;
+    height: 50px;
+    transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
     align-items: center;
@@ -200,10 +202,39 @@ body{
 .mass p{
     position: absolute;
     bottom: -25px;
-    left: 50%;
+    left: 66%;
     transform: translateX(-50%);
+    transform: skew(45deg);
     font-weight: bold;
     margin: 0;
+}
+
+.goaltape{
+    border: 1px solid black;
+    background: #000;
+    width: 30px;
+    height: 50px;
+    transform: skewX(-45deg);
+    position: absolute;
+    top: 0px;
+    right: 20px;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.goaltape > div{
+    width: 14px;
+    height: 9.5px;
+}
+
+.blacktape{
+    background: black;
+}
+
+.whitetape{
+    background: white;
 }
 
 .camel{
@@ -213,13 +244,13 @@ body{
     position: absolute;
 }
 
-.command{
-    background-color: rgba(114, 114, 114, 0.8);
+.command_place{
+    background-color: rgba(138, 138, 138, 0.6);
     border: solid 1px #000;
     width: 90%;
     height: 100px;
     margin: 0 auto;
-    margin-top: 40px;
+    margin-top: -20px;
 
     display: flex;
     flex-direction: row;
@@ -229,4 +260,6 @@ body{
 
 .command p{
     font-size: 20px;
+    font-weight: bold;
+    cursor : pointer;
 }
