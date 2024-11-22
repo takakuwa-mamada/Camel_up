@@ -1,0 +1,66 @@
+.logo {
+    font-size: 60px;
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.name_input {
+    font-size: 10px;
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    transform: translateX(-49%);
+}
+
+.login {
+    font-size: 10px;
+    position: absolute;
+    top: 450px;
+    left: 50%;
+    transform: translateX(-49%);
+}
+
+.p-fv {
+    width: 100%;
+    height: 800px;
+
+    background-image: url(desert.png);
+
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+.p-fv::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.p-fv__copy {
+    position: relative;
+    z-index: 10;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    font-size: 56px;
+    font-weight: bold;
+}
+
+.tutorial {
+    position: absolute;
+    top: 20px;
+    left: 90%;
+}
