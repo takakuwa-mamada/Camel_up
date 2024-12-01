@@ -1,8 +1,8 @@
-//version 1.2.0
+//version 1.3.0
 /*
 「」はフローチャートに対応
 
---1.1.0までに実装した機能--
+--1.2.0までに実装した機能--
 ・ゲームボードの要素
 ・最初に3EP配布
 ・最終予想カードの配布
@@ -15,31 +15,32 @@
 ・手番のループ
 ・レグのループ
 ・レグの終了判定
+・「ゲーム終了時の得点ラウンド」
 ・ゲームの終了判定
 
---1.2.0で実装した機能--
-・「ゲーム終了時の得点ラウンド」
-
-
+--1.3.0で実装した機能--
+・投票チケットの配置
+・プレイヤーの手番選択（レグの投票）
+・レグの投票（「投票チケットを１枚取る」）
+・EPがマイナスにならないようにする
+・レグ終了時にチケットを戻す
+・「レグの得点ラウンド」
+・EPがマイナスにならないようにする
 
 --未実装の機能--
 ・通信機能
 ・プレイヤーの参加
 ・ゲームの開始
-・投票チケットの配置
 ・観客タイルの配布
 ・イカれたラクダ、灰ダイス
-・プレイヤーの手番選択（タイル設置orレグの投票）
+・プレイヤーの手番選択（タイル設置）
 ・灰ダイス時の動かすラクダの判定
 ・逆走時の移動
 ・タイルを踏んだ時の動作（応援面、ブーイング面）
 ・タイルを踏んだ時に設置者がEP獲得
 ・タイル設置（「観客タイルを置く」）
-・レグの投票（「投票チケットを１枚取る」）
-・「盤面の整理」
-・「レグの得点ラウンド」
+・レグ終了時に観客タイルを戻す
 ・勝者判定
-・EPがマイナスにならないようにする
 */
 
 
@@ -54,7 +55,6 @@ class space{
     count = 0;          //スペースにいるラクダの数
 }
 
-
 //トラック
 const track = new Array;
 s0 = new space(0); track.push(s0); s1 = new space(1); track.push(s1);
@@ -66,8 +66,38 @@ s10 = new space(10); track.push(s10); s11 = new space(11); track.push(s11);
 s12 = new space(12); track.push(s12); s13 = new space(13); track.push(s13);
 s14 = new space(14); track.push(s14); s15 = new space(15); track.push(s15);
 s16 = new space(16); track.push(s16); s17 = new space(17); track.push(s17);
-s18 = new space(18); track.push(s18); s19 = new space(19); track.push(s19);
 
+
+
+//レグの投票チケット
+class legTicket{
+    constructor(color, winEP){
+        this.color = color;     //投票するラクダの色
+        this.winEP = winEP;     //1位の賞金
+    }
+}
+
+const legRed=[]; const legBlue=[]; const legYellow=[]; const legGreen=[]; const legPurple=[];
+
+const red1 = new legTicket("red", 5); const red2 = new legTicket("red", 3);
+const red3 = new legTicket("red", 2); const red4 = new legTicket("red", 2);
+legRed.push(red1); legRed.push(red2); legRed.push(red3); legRed.push(red4);
+
+const blue1 = new legTicket("blue", 5); const blue2 = new legTicket("blue", 3);
+const blue3 = new legTicket("blue", 2); const blue4 = new legTicket("blue", 2);
+legBlue.push(blue1); legBlue.push(blue2); legBlue.push(blue3); legBlue.push(blue4);
+
+const yellow1 = new legTicket("yellow", 5); const yellow2 = new legTicket("yellow", 3);
+const yellow3 = new legTicket("yellow", 2); const yellow4 = new legTicket("yellow", 2);
+legYellow.push(yellow1); legYellow.push(yellow2); legYellow.push(yellow3); legYellow.push(yellow4);
+
+const green1 = new legTicket("green", 5); const green2 = new legTicket("green", 3);
+const green3 = new legTicket("green", 2); const green4 = new legTicket("green", 2);
+legGreen.push(green1); legGreen.push(green2); legGreen.push(green3); legGreen.push(green4);
+
+const purple1 = new legTicket("purple", 5); const purple2 = new legTicket("purple", 3);
+const purple3 = new legTicket("purple", 2); const purple4 = new legTicket("purple", 2);
+legPurple.push(purple1); legPurple.push(purple2); legPurple.push(purple3); legPurple.push(purple4);
 
 
 //ラクダ
@@ -114,9 +144,11 @@ class player{
     constructor(name){
         this.name = name;
     }
-    order=0;      //順番 
+    order = 0;      //順番 
     EP = 3;     //所持金　最初に3EP配布される
-    race_card = ["red", "blue", "yellow", "green", "purple"]; //所持している最終投票カード
+    ranking = 0;    //最終順位
+    raceCard = ["red", "blue", "yellow", "green", "purple"]; //所持している最終投票カード
+    ticket = [];    //所持しているレグの投票チケット
 }
 
 
@@ -152,6 +184,14 @@ function game(){
         console.log("=========================================");
         goal = leg();
         //legPoint();
+
+        console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        legPoint();
+        //プレイヤーの獲得金額
+        for(let i=0; i<players.length; i++){
+            p = players[i];
+            console.log(p.name, p.EP);
+        }
     }
 
 
@@ -170,7 +210,6 @@ function game(){
         p = players[i];
         console.log(p.name, p.EP);
     }
-    //legPoint();
     gamepoint();
     //ranking();
 
@@ -192,6 +231,7 @@ function game(){
 
 
 }
+
 
 
 function playerJoin(){
@@ -222,9 +262,14 @@ function setCamel(){
             }
         }
 
-
         //出たダイスを取り除く
         startDice.splice(j,1);
+    }
+
+    //開始時のラクダの位置
+    for(let i=0; i<camels.length; i++){
+        c = camels[i];
+        console.log(c.color, c.location, c.layer);
     }
 }
 
@@ -288,39 +333,41 @@ function move(cam, n){
 }
 
 
+
 //レグの処理
 function leg(){
     var restDice = diceColor.concat();
     var rolledDice =[]      //出たダイス
-
-    //レグ開始時のラクダの位置
-    for(let i=0; i<camels.length; i++){
-        c = camels[i];
-        console.log(c.color, c.location, c.layer);
-    }
+    var legR = legRed.concat();
+    var legB = legBlue.concat();
+    var legY = legYellow.concat();
+    var legG = legGreen.concat();
+    var legP = legPurple.concat();
+    var tickets=[];
+    tickets.push(legR); tickets.push(legB); tickets.push(legY); tickets.push(legG); tickets.push(legP);
 
     //プレイヤーの手番
     while(rolledDice.length!=5){
         console.log("***************************************");
         console.log(players[startPlayerMarker].name);
-        var choice = Math.floor(Math.random()*3);       //今回は乱数で行動を選択
+        var choice = Math.floor(Math.random()*4);       //今回は乱数で行動を選択
 
         //投票
         if(choice == 0){
             console.log("vote");
 
             //投票できないときはサイコロを振る
-            if(players[startPlayerMarker].race_card.length==0){
-                choice = 1;
+            if(players[startPlayerMarker].raceCard.length==0){
+                choice = 10;
             }
             
             else{
                 //投票先、色を乱数で決定　tb:１位or最下位　c:色
                 var tb = Math.floor(Math.random()*2);       
-                var c = Math.floor(Math.random()*players[startPlayerMarker].race_card.length);
+                var c = Math.floor(Math.random()*players[startPlayerMarker].raceCard.length);
 
-                var col = players[startPlayerMarker].race_card[c];  //色名の取得
-                players[startPlayerMarker].race_card.splice(c,1);   //投票した色を手札からなくす
+                var col = players[startPlayerMarker].raceCard[c];  //色名の取得
+                players[startPlayerMarker].raceCard.splice(c,1);   //投票した色を手札からなくす
                 var v = new vote(players[startPlayerMarker], col);
                 
                 //投票
@@ -333,12 +380,31 @@ function leg(){
                 }
 
                 //残り手札の表示
-                console.log("hand:",players[startPlayerMarker].race_card);
+                console.log("hand:",players[startPlayerMarker].raceCard);
             }
         }
 
+        if(choice == 1 || choice==2){
+            console.log("legVote");
+            if(tickets.length==0){
+                choice = 10;
+            }
+            else{
+                //色を乱数で決定
+                var c = Math.floor(Math.random()*tickets.length);
+                //チケットをプレイヤーに与える
+                players[startPlayerMarker].ticket.push(tickets[c][0]);
+                console.log(tickets[c][0].color, tickets[c][0].winEP)
+                //場からチケットを削除
+                tickets[c].shift();
+                if(tickets[c].length==0){
+                    tickets.splice(c,1);
+                } 
+            }          
+        }
+
         //ダイスを振る
-        if(choice != 0){
+        if(choice > 2){
             console.log("rollDice");
 
             //ピラミッドチケットは無し　選択してすぐに1EP獲得
@@ -381,16 +447,73 @@ function leg(){
     return 0;   //レグ終了時にゴールしてない
 }
 
-function legPoint(){
 
+
+function legPoint(){
+    //レグ終了時のラクダの位置
+    for(let i=0; i<camels.length; i++){
+        c = camels[i];
+        console.log(c.color, c.location, c.layer);
+    }
+
+    var getEP;
+    var cam1st = redCam;
+    var cam2nd = blueCam;
+
+    //順位決定
+    for(let i=1; i<5; i++){
+        var c=camels[i];
+        if(cam1st.location<c.location){
+            cam2nd = cam1st;
+            cam1st = c;
+        }else if(cam1st.location == c.location){
+            if(cam1st.layer < c.layer){
+                cam2nd = cam1st;
+                cam1st = c;
+            }
+        }else if(cam2nd.location<c.location){
+            cam2nd = c;
+        }else if(cam2nd.location == c.location){
+            if(cam2nd.layer < c.layer){
+                cam2nd = c;
+            }
+        }
+    }
+    console.log("1st: ", cam1st.color);
+    console.log("2nd: ", cam2nd.color);    
+
+    for(let i=0; i<players.length; i++){
+        getEP = 0;
+        
+        //得点計算
+        while(players[i].ticket.length>0){
+            if(players[i].ticket[0].color == cam1st.color){
+                getEP += players[i].ticket[0].winEP;
+            }else if(players[i].ticket[0].color == cam2nd.color){
+                getEP += 1;
+            }else{
+                getEP -= 1;
+            }
+            console.log(players[i].name, players[i].ticket[0], getEP);
+            players[i].ticket.shift();
+        }
+
+        //所持金はマイナスにならない
+        players[i].EP += getEP;
+        if(players[i].EP<0){
+            players[i].EP = 0; 
+        }
+    }
 }
+
+
 
 function gamepoint(){
     topCamel = redCam;      //全体の一位
     bottomCamel = redCam;   //全体の最下位
 
     //一位と最下位の決定
-    for(let i=1; i<4; i++){
+    for(let i=1; i<5; i++){
         //一位
         if(camels[i].location > topCamel.location){
             topCamel = camels[i];
@@ -432,7 +555,9 @@ function gamepoint(){
             }
             count += 1;
         }else{
-            topVote[i].name.EP -= 1;
+            if(topVote[i].name.EP>0){
+                topVote[i].name.EP -= 1;
+            }
         }
     }
 
@@ -453,13 +578,19 @@ function gamepoint(){
             }
             count += 1;
         }else{
-            bottomVote[i].name.EP -= 1;
+            if(bottomVote[i].name.EP>0){
+                bottomVote[i].name.EP -= 1;
+            }
         }
     }
 }
 
+
+
 function ranking(){
 
 }
+
+
 
 game();
