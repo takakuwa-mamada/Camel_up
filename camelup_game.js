@@ -1,41 +1,39 @@
-//version 1.3.0
+//version 1.4.0
 /*
 「」はフローチャートに対応
 
---1.2.0までに実装した機能--
+--1.3.0までに実装した機能--
 ・ゲームボードの要素
+・投票チケットの配置
 ・最初に3EP配布
 ・最終予想カードの配布
 ・競争ラクダ
-・プレイヤーの手番選択（最終予想orダイス）
-・最終予想（「レース全体の勝者か敗者に投票」）
+・プレイヤーの手番選択（ダイスor最終予想orレグの投票）
 ・ダイス選択時に1EP獲得（ピラミッドチケットは無し）
 ・１つのレグで被らないようにダイスを振る
-・ダイスに応じたラクダ集団の移動
+・ダイスに応じたラクダ集団の移動（競争ラクダのみ）
+・最終予想（「レース全体の勝者か敗者に投票」）
+・レグの投票（「投票チケットを１枚取る」）
 ・手番のループ
 ・レグのループ
 ・レグの終了判定
+・「レグの得点ラウンド」
+・レグ終了時にチケットを戻す
 ・「ゲーム終了時の得点ラウンド」
 ・ゲームの終了判定
 
---1.3.0で実装した機能--
-・投票チケットの配置
-・プレイヤーの手番選択（レグの投票）
-・レグの投票（「投票チケットを１枚取る」）
-・EPがマイナスにならないようにする
-・レグ終了時にチケットを戻す
-・「レグの得点ラウンド」
-・EPがマイナスにならないようにする
+--1.4.0で実装した機能--
+・イカれたラクダ、灰ダイス
+・灰ダイス時の動かすラクダの判定
+・逆走時の移動
+
 
 --未実装の機能--
 ・通信機能
 ・プレイヤーの参加
 ・ゲームの開始
 ・観客タイルの配布
-・イカれたラクダ、灰ダイス
 ・プレイヤーの手番選択（タイル設置）
-・灰ダイス時の動かすラクダの判定
-・逆走時の移動
 ・タイルを踏んだ時の動作（応援面、ブーイング面）
 ・タイルを踏んだ時に設置者がEP獲得
 ・タイル設置（「観客タイルを置く」）
@@ -121,13 +119,13 @@ const greenCam = new camel("green", 0); camels.push(greenCam);
 const purpleCam = new camel("purple", 0); camels.push(purpleCam);
 
 //イカれたラクダ
-//const whiteCam = new camel("white", 1); camels.push(whiteCam);
-//const blackCam = new camel("black", 1); camels.push(blackCam);
+const whiteCam = new camel("white", 1); camels.push(whiteCam);
+const blackCam = new camel("black", 1); camels.push(blackCam);
 
 
 
 //ダイス
-const diceColor = ["red", "blue", "yellow", "green", "purple"];      //今回grayは無し
+const diceColor = ["red", "blue", "yellow", "green", "purple", "gray"];
 
 //振った後のダイス
 class dice{
@@ -245,15 +243,15 @@ function playerJoin(){
 
 function setCamel(){
     var startDice = diceColor.concat();
-    //startDice.pop();     //grayがあるとき
-    for(let i=0; i<diceColor.length; i++){
+    startDice.pop();
+    console.log(startDice);
+    for(let i=0; i<5; i++){
         //色
         var j = Math.floor(Math.random()*startDice.length);
         //目
         var n = Math.floor(Math.random()*3+1);
 
-        console.log("j:",startDice[j]);
-        console.log("n:",n);
+        console.log(startDice[j], n);
 
         //ダイスと同じ色のラクダを動かす
         for(let k=0; k<camels.length; k++){
@@ -265,6 +263,21 @@ function setCamel(){
         //出たダイスを取り除く
         startDice.splice(j,1);
     }
+
+    
+    var wb = Math.floor(Math.random()*2);
+    if(wb == 0){
+        console.log("white", n);
+        move(whiteCam, 17-n);
+        console.log("black", n);
+        move(blackCam, 17-n);
+    }else{
+        console.log("black", n);
+        move(blackCam, 17-n);
+        console.log("white", n);
+        move(whiteCam, 17-n);
+    }
+
 
     //開始時のラクダの位置
     for(let i=0; i<camels.length; i++){
@@ -289,14 +302,12 @@ function move(cam, n){
         cam.below.above = null;
     }
 
-
     //移動
     cam.location += n;
     //ゴールした場合
     if(cam.location > 16){
         cam.location = 17;
     }
-
 
     //移動先のスペースの整理
     track[cam.location].count += 1;
@@ -314,7 +325,6 @@ function move(cam, n){
         track[cam.location].top = cam;
         cam.layer = cam.below.layer + 1;
     }
-
     //移動するラクダの上にラクダがいる場合
     if(cam.above != null){
         aboveCam = cam.above;
@@ -329,7 +339,6 @@ function move(cam, n){
             aboveCam = aboveCam.above;
         }
     }
-    
 }
 
 
@@ -384,7 +393,7 @@ function leg(){
             }
         }
 
-        if(choice == 1 || choice==2){
+        if(choice == 1){
             console.log("legVote");
             if(tickets.length==0){
                 choice = 10;
@@ -404,7 +413,7 @@ function leg(){
         }
 
         //ダイスを振る
-        if(choice > 2){
+        if(choice > 1){
             console.log("rollDice");
 
             //ピラミッドチケットは無し　選択してすぐに1EP獲得
@@ -421,14 +430,43 @@ function leg(){
             rolledDice.push(d);
             restDice.splice(c,1);
             
-            //ラクダの移動
-            for(let k=0; k<camels.length; k++){
-                if(camels[k].color==col){
-                    move(camels[k], n);
-                    
-                    //ゴール(16を越える)したら終了
-                    if(camels[k].location==17){
-                        return 1;
+
+            //灰ダイス時
+            if(col=="gray"){
+                if(whiteCam.above==blackCam){
+                    move(blackCam, -n);
+                    console.log("black");
+                }else if(blackCam.above==whiteCam){
+                    move(whiteCam, -n);
+                    console.log("white");
+                }else if(whiteCam.above!=null && blackCam.above==null){
+                    move(whiteCam, -n);
+                    console.log("white");
+                }else if(blackCam.above!=null && whiteCam.above==null){
+                    move(blackCam, -n);
+                    console.log("black");
+                }else{
+                    var wb = Math.floor(Math.random()*2);
+                    if(wb == 0){
+                        move(whiteCam, -n);
+                        console.log("white");
+                    }else{
+                        move(blackCam, -n);
+                        console.log("black");
+                    }
+                }
+            }
+            //他のダイス
+            else{
+                //ラクダの移動
+                for(let k=0; k<camels.length; k++){
+                    if(camels[k].color==col){
+                        move(camels[k], n);
+                        
+                        //ゴール(16を越える)したら終了
+                        if(camels[k].location==17){
+                            return 1;
+                        }
                     }
                 }
             }
@@ -470,6 +508,12 @@ function legPoint(){
             if(cam1st.layer < c.layer){
                 cam2nd = cam1st;
                 cam1st = c;
+            }else if(cam2nd.location < c.location){
+                cam2nd = c;
+            }else if(cam2nd.location == c.location){
+                if(cam2nd.layer < c.layer){
+                    cam2nd = c;
+                }
             }
         }else if(cam2nd.location<c.location){
             cam2nd = c;
