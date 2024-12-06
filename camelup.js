@@ -207,7 +207,7 @@ new Vue({
                 let dicecolor = Math.floor(Math.random() * 7);
                 let dicenumber = Math.floor(Math.random() * 3) + 1;
                 if (this.dice_flag[dicecolor] === 0) {
-                    this.DiceMovie(dicecolor, dicenumber);
+                    //this.DiceMovie(dicecolor, dicenumber);
                     setTimeout(() => {
                         this.CamelMove(dicecolor, dicenumber);
                         if (this.tile_color[camels[dicecolor].position - 1] === "#0f0") { //緑タイルを踏んだ時
