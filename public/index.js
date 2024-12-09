@@ -32,8 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-
 const camels = [
     { image: "camellist/redCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //赤
     { image: "camellist/blueCamel.png", position: 1, startposition: 1, heightposition: 1, startheightposition: 1 }, //青
@@ -646,27 +644,17 @@ new Vue({
 
 // ボードの初期化
 function createBoard(camels) {
-    board.innerHTML = "";
-    for (let i = 0; i < 16; i++) {
-        const space = document.createElement("div");
-        space.classList.add("space");
- 
-        // 現在のマスにいるラクダを取得し、上から順に縦にずらして表示(未完成，下にもぐりこんじゃう)
-        const camelsOnSpace = camels.filter(camel => camel.position === i);
-        camelsOnSpace.forEach((camel, index) => {
-            const camelIcon = document.createElement("div");
-            camelIcon.classList.add("camel-icon", camel.color);
-            camelIcon.innerText = camel.color[0].toUpperCase();
- 
-            // スタックされるラクダを縦にずらして表示
-            camelIcon.style.bottom = `${index * 35}px`; // 35pxずつ縦にずらす
-            space.appendChild(camelIcon);
+    const board = document.getElementById("board");
+    board.innerHTML = ""; // ボードをクリア
+    camels.forEach((camel) => {
+        const camelDiv = document.createElement("div");
+        camelDiv.style.position = "absolute";
+        camelDiv.style.left = `${camel.position * 50}px`; // 位置を反映
+        camelDiv.innerText = camel.color;
+        board.appendChild(camelDiv);
     });
- 
-    board.appendChild(space);
-    }
 }
- 
+
     // 引かれたサイコロの表示を更新
 function updateDrawnDice(drawnDice) {
     drawnDiceContainer.innerHTML = "";
@@ -678,45 +666,33 @@ function updateDrawnDice(drawnDice) {
         drawnDiceContainer.appendChild(dice);
     });
 }
- 
+
 // チャットウィンドウにメッセージを追加
 function addChatMessage(message) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message");
     messageElement.innerText = message;
     chatWindow.appendChild(messageElement);
- 
+
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
- 
-    // 初期ボードの作成
+
+// 接続時の処理
 socket.on("connect", () => {
-createBoard([]);
-});
- 
-// サーバーからラクダの移動データを受信して更新
-socket.on("camelMoved", (data) => {
-    console.log("返ってきた！");
-    console.log("サイコロの結果:", data.result);
-    // サーバーから受信したラクダ情報をVueインスタンスに反映
-    //server上のcamelsの状態をクライアント側にも反映
-    data.camels.forEach(camel => {
-        camels.forEach( localcamel => {
-            if(localcamel.color == camel.color){
-              localcamel.position = camel.position;
-            }
-        });
+    console.log("Connected to server");
+    document.getElementById("Roll_Dice").addEventListener("click", () => {
+        socket.emit("rollDice");
     });
- 
-    // ログに表示
-    const movedCamel = data.result.camel;
-    const steps = data.result.steps;
-    console.log(`ラクダ ${movedCamel.color} が ${steps} マス進みました！`);
 });
- 
- 
+
 // サイコロを振るボタンの処理
 //server.jsのrollDiceイベントに送信
 document.getElementById("Roll_Dice").onclick = () => {
-socket.emit("rollDice");
+    socket.emit("rollDice");
 };
+
+// サーバーからラクダの位置更新を受信
+socket.on("camelMoved", (data) => {
+    console.log("受信したラクダの状態:", data);
+    createBoard(data.camels); // 最新状態でボードを更新
+});

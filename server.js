@@ -43,11 +43,12 @@
 
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server); // socket.ioをサーバに統合
+const io = new Server(server);
+
 
 const PORT = 4000;
 app.use(express.static('public'));
@@ -107,7 +108,6 @@ const purple1 = new legTicket("purple", 5); const purple2 = new legTicket("purpl
 const purple3 = new legTicket("purple", 2); const purple4 = new legTicket("purple", 2);
 legPurple.push(purple1); legPurple.push(purple2); legPurple.push(purple3); legPurple.push(purple4);
 
-
 //ラクダ
 class camel{
     constructor(color, type){
@@ -147,8 +147,6 @@ class dice{
         this.num = num;
     }
 }
-
-
 
 //プレイヤー
 class player{
@@ -300,24 +298,26 @@ function setCamel(){
 }
 //追加した(高鍬)
 function moveCamel() {
+    // サイコロが全て引かれた場合、再度リセット
     if (diceBox.length === 0) {
-      diceBox = ["red", "blue", "green", "yellow", "purple"];
-      drawnDice = [];
+        diceBox = ["red", "blue", "green", "yellow", "purple"];
+        drawnDice = [];
     }
-  
+
     const diceIndex = Math.floor(Math.random() * diceBox.length);
     const camelColor = diceBox[diceIndex];
+
     diceBox.splice(diceIndex, 1);
     drawnDice.push(camelColor);
-  
+
     const camel = camels.find((c) => c.color === camelColor);
     const steps = rollDice();
     camel.position += steps;
-  
+
     if (camel.position >= COURSE_LENGTH) {
-      camel.position = COURSE_LENGTH;
+        camel.position = COURSE_LENGTH;
     }
-  
+
     return { camel, steps, drawnDice };
 }
 
@@ -373,8 +373,6 @@ function move(cam, n){
         }
     }
 }
-
-
 
 //レグの処理
 function leg(){
@@ -518,8 +516,6 @@ function leg(){
     return 0;   //レグ終了時にゴールしてない
 }
 
-
-
 function legPoint(){
     //レグ終了時のラクダの位置
     for(let i=0; i<camels.length; i++){
@@ -582,8 +578,6 @@ function legPoint(){
         }
     }
 }
-
-
 
 function gamepoint(){
     topCamel = redCam;      //全体の一位
@@ -662,31 +656,29 @@ function gamepoint(){
     }
 }
 
-
-
 function ranking(){
 
 }
-
-
 
 // game();
 
 // ソケットの処理 
 //接続中のプレーヤーからロールダイスイベントが来た時，そのダイスの出目と色をindex.jsに送信
 io.on("connection", (socket) => {
-    console.log("New player connected");
+    console.log(`Player connected: ${socket.id}`);
 
+    // サイコロを振るイベント
     socket.on("rollDice", () => {
-        // サイコロを振る
-        const result = moveCamel(); // moveCamel関数で色と出目を決定
-        // console.log("サイコロの結果:", result);
-    
-        // クライアントにサイコロの結果を送信
-        io.emit("camelMoved", { camels, result });
+        const result = moveCamel();
+        console.log("ラクダの移動結果:", result);
+        io.emit("camelMoved", { camels }); // 最新のラクダ状態を全クライアントに送信
     });
-    
+
+    socket.on("disconnect", () => {
+        console.log(`Player disconnected: ${socket.id}`);
+    });
 });
+
 
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
