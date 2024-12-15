@@ -374,6 +374,10 @@ function move(cam, n){
     }
 }
 
+function rollDice() {
+    return Math.floor(Math.random() * 3) + 1;
+}
+
 //レグの処理
 function leg(){
     var restDice = diceColor.concat();
@@ -671,7 +675,8 @@ io.on("connection", (socket) => {
     socket.on("rollDice", () => {
         const result = moveCamel();
         console.log("ラクダの移動結果:", result);
-        io.emit("camelMoved", { camels }); // 最新のラクダ状態を全クライアントに送信
+        socket.broadcast.emit("camelMoved", { result }); // 最新のラクダ状態を全クライアントに送信
+        socket.emit("camelMoved", { result });
     });
 
     socket.on("disconnect", () => {
