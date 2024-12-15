@@ -156,6 +156,7 @@
                             <div v-for="(t_mass, t_mass_index) in cells" class="transparent_mass" :key="t_mass_index" :id="'t_mass-' + (t_mass_index + 1)" @click="SelectTile(t_mass_index)" @mouseenter="HoverTile(t_mass_index)" @mouseleave="LeaveTile(t_mass_index)">
                             </div>
                         </div>
+                        <div id="board"></div>
                         <div class="goaltape">
                             <div class="blacktape"></div>
                             <div class="whitetape"></div>
@@ -174,7 +175,7 @@
                     <div  class="command_place"><!--v-if="playerturn === 1"-->
                         <div  v-for="(command, command_index) in commands[0]" v-if="command_flag === 0" class="command" :key="command_index">
                             <!--<p id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</p>-->
-                            <button type="button" id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
+                            <button type="button" id="aaa" xid="'command0-' + command_index" >{{command.word}}</button>
                         </div>
                         <div  v-for="(command, command_index) in commands[1]" v-if="command_flag === 4 || (command_flag === 1 && ticket_flag[command_index] !== 0)" class="command" :key="command_index">
                             <!--<p @click="CommandClick(command)">{{command.word}}</p>-->
