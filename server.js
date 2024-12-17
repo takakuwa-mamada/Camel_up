@@ -409,7 +409,6 @@ function leg(){
                 //投票先、色を乱数で決定　tb:１位or最下位　c:色
                 var tb = Math.floor(Math.random()*2);       
                 var c = Math.floor(Math.random()*players[startPlayerMarker].raceCard.length);
-
                 var col = players[startPlayerMarker].raceCard[c];  //色名の取得
                 players[startPlayerMarker].raceCard.splice(c,1);   //投票した色を手札からなくす
                 var v = new vote(players[startPlayerMarker], col);
@@ -666,7 +665,6 @@ function ranking(){
 
 // game();
 
-// ソケットの処理 
 //接続中のプレーヤーからロールダイスイベントが来た時，そのダイスの出目と色をindex.jsに送信
 io.on("connection", (socket) => {
     console.log(`Player connected: ${socket.id}`);

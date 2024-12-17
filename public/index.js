@@ -224,43 +224,49 @@ const app = new Vue({
             this.remaindice_count = 0;
         },
 
-        // RollDice() { //サイコロを振った時の処理
-        //     while (this.remaindice_count <= 4) {
-        //         let dicecolor = Math.floor(Math.random() * 7);
-        //         let dicenumber = Math.floor(Math.random() * 3) + 1;
-        //         if (this.dice_flag[dicecolor] === 0) {
-        //             //this.DiceMovie(dicecolor, dicenumber);
-        //             setTimeout(() => {
-        //                 this.CamelMove(dicecolor, dicenumber);
-        //                 if (this.tile_color[camels[dicecolor].position - 1] === "#0f0") { //緑タイルを踏んだ時
-        //                     setTimeout(() => {
-        //                         this.CamelMove(dicecolor, 1);
-        //                     }, 5000);
-        //                 }
-        //                 else if (this.tile_color[camels[dicecolor].position - 1] === "#f00") { //赤タイルを踏んだ時
-        //                     setTimeout(() => {
-        //                         this.MinusMove(dicecolor);
-        //                     }, 2500);
-        //                 }
-        //                 if (dicecolor !== 6) {
-        //                     this.$set(this.dice_flag, dicecolor, 1);
-        //                 }
-        //                 else {
-        //                     this.$set(this.dice_flag, 5, 1);
-        //                 }
-        //                 this.remaindice_count += 1;
-        //                 this.PlayerTurn();
-        //             }, 5000);
-        //             break;
-        //         }
-        //         else {
-        //             continue;
-        //         }
-        //     }
-        //     if (this.remaindice_count == 5) {
-        //         this.Rollreset();
-        //     }
-        // },
+        RollDice(dicecolor,number) { //サイコロを振った時の処理
+            // console.log(remaindice_count);
+            while (this.remaindice_count <= 4) {
+                console.log(dicecolor)
+                console.log(number)
+                // colorが文字列の場合、インデックスに変換する
+                if (typeof dicecolor === 'string') {
+                    color = camelColorMap[dicecolor];
+                }
+                console.log(color);
+                if (this.dice_flag[color] === 0) {
+                    //this.DiceMovie(dicecolor, dicenumber);
+                    setTimeout(() => {
+                        this.CamelMove(color, number);
+                        if (this.tile_color[camels[color].position - 1] === "#0f0") { //緑タイルを踏んだ時
+                            setTimeout(() => {
+                                this.CamelMove(color, 1);
+                            }, 5000);
+                        }
+                        else if (this.tile_color[camels[color].position - 1] === "#f00") { //赤タイルを踏んだ時
+                            setTimeout(() => {
+                                this.MinusMove(color);
+                            }, 2500);
+                        }
+                        if (color !== 6) {
+                            this.$set(this.dice_flag, color, 1);
+                        }
+                        else {
+                            this.$set(this.dice_flag, 5, 1);
+                        }
+                        this.remaindice_count += 1;
+                        this.PlayerTurn();
+                    }, 5000);
+                    break;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (this.remaindice_count == 5) {
+                this.Rollreset();
+            }
+        },
 
         // CommandClick(command_word) { //各コマンドを押したときの処理
         //     this.SoundEffect();
@@ -436,204 +442,194 @@ const app = new Vue({
                 }
             }
         },
-        CamelMove(color, newnumber) { //駒のアニメーション
-            // colorが文字列の場合、インデックスに変換する
-            if (typeof color === 'string') {
-                color = camelColorMap[color];
-            }
-        
-            // colorが有効なインデックスか確認
-            if (typeof this.camels[color] === 'undefined') {
-                console.error(`Invalid camel color index: ${color}`);
-                return; // 無効な場合は処理を中断
-            }
-        
-            const camel = this.camels[color];
-            const uplist = [];
-            console.log("ラクダを動かします．");
-        
-            for (let up = 0; up < this.camels.length; up++) {
-                const camelUp = this.camels[up];
-                const zindex = document.getElementById(`camel-${up}`);
-        
-                if (!camelUp) continue;
-        
-                if (camel.position === camelUp.position && camel.heightposition <= camelUp.heightposition) {
-                    uplist.push(up);
-                    if (zindex) zindex.style.zIndex = camelUp.heightposition + 10;
-                } else {
-                    if (zindex) zindex.style.zIndex = camelUp.heightposition;
-                }
-            }
-        
-            const direction = (color === 5 || color === 6) ? -1 : 1; // 灰色ダイスかどうか判定
-            const newPosition = camel.position + direction * newnumber;
-            const newHeightPosition = this.camels.filter(c => c.position === newPosition).length;
-        
-            // アニメーション処理
-            if (newnumber === 1) {
-                anime({
-                    targets: uplist.map(up => `#camel-${up}`),
-                    translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-                    translateY: `-= ${25 * (newHeightPosition - camel.heightposition)}`,
-                    easing: 'easeInOutSine',
-                    duration: 800,
-                    delay: 0,
-                });
-            } else {
-                anime({
-                    targets: uplist.map(up => `#camel-${up}`),
-                    keyframes: [
-                        {
-                            translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-                            translateY: `+= ${25 * camel.heightposition}`,
-                            easing: 'easeInOutSine',
-                            duration: 800,
-                            delay: 0,
-                        },//一旦降りる
-                        {
-                            translateX: `${direction === 1 ? "+=" : "-="} ${80 * (newnumber - 2)}`,
-                            easing: 'easeInOutSine',
-                            duration: 800,
-                            delay: 0,
-                        },//降りた後進む
-                        {
-                            translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-                            translateY: `-= ${25 * newHeightPosition}`,
-                            easing: 'easeInOutSine',
-                            duration: 800,
-                            delay: 0,
-                        }//乗る
-                    ],
-                });
-            }
-        
-            // 高さと位置の更新
-            const originalHeightPosition = camel.heightposition;
-            const originalPosition = camel.position;
-        
-            for (let i = 0; i < uplist.length; i++) {
-                const upIndex = uplist[i];
-                const camelUp = this.camels[upIndex];
-                if (camelUp) {
-                    this.$set(camelUp, 'heightposition', newHeightPosition - originalHeightPosition + camelUp.heightposition);
-                    this.$set(camelUp, 'position', originalPosition + direction * newnumber);
-                }
-            }
-        },
-        
         // CamelMove(color, newnumber) { //駒のアニメーション
+        
         //     const camel = this.camels[color];
         //     const uplist = [];
-        //     console.log("ラクダを動かします．")
-        //     for (let up = 0; up < 7; up++) {
+        //     console.log("ラクダを動かします．");
+            
+        //     for (let up = 0; up < this.camels.length; up++) {
+        //         const camelUp = this.camels[up];
         //         const zindex = document.getElementById(`camel-${up}`);
-        //         if (camel.position === this.camels[up].position && camel.heightposition <= this.camels[up].heightposition){
-
+        
+        //         if (!camelUp) continue;
+        
+        //         if (camel.position === camelUp.position && camel.heightposition <= camelUp.heightposition) {
         //             uplist.push(up);
-        //             zindex.style.zIndex = this.camels[up].heightposition + 10;
-        //         }
-        //         else {
-        //             zindex.style.zIndex = this.camels[up].heightposition;
-        //         }
-        //     }
-        //     if (color === 5 || color === 6) { //灰色ダイスが出たとき
-        //         const newheightpositon = this.camels.filter(c => c.position === camel.position - newnumber).length;
-        //         if (newnumber === 1) { //1進んだとき
-        //             anime({
-        //                 targets: uplist.map(up => `#camel-${up}`),
-        //                 translateX: `-= ${80}`,
-        //                 translateY: `-= ${25 * (newheightpositon - camel.heightposition)}`,
-        //                 easing: 'easeInOutSine',
-        //                 duration: 800,
-        //                 delay: 0,
-
-        //             })
-        //         }
-        //         else {
-        //             anime({
-        //                 targets: uplist.map(up => `#camel-${up}`),
-        //                 keyframes: [
-        //                     {
-        //                         translateX: `-= ${80}`,
-        //                         translateY: `+= ${25 * camel.heightposition}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     }, //一旦降りる処理
-        //                     {
-        //                         translateX: `-= ${80 * (newnumber - 2)}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     }, //降りた後進む処理
-        //                     {
-        //                         translateX: `-= ${80}`,
-        //                         translateY: `-= ${25 * newheightpositon}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     } //乗る処理
-        //                 ],
-
-        //             });
-        //         }
-        //         const colorheightposition = camel.heightposition;
-        //         const colorposition = camel.position;
-        //         for (let i = 0; i < uplist.length; i++) {
-        //             this.$set(this.camels[uplist[i]], 'heightposition', newheightpositon - colorheightposition + this.camels[uplist[i]].heightposition);
-        //             this.$set(this.camels[uplist[i]], 'position', colorposition - newnumber);
+        //             if (zindex) zindex.style.zIndex = camelUp.heightposition + 10;
+        //         } else {
+        //             if (zindex) zindex.style.zIndex = camelUp.heightposition;
         //         }
         //     }
-        //     else { //灰色ダイス以外が出たとき
-        //         const newheightpositon = this.camels.filter(c => c.position === camel.position + newnumber).length;
-        //         if (newnumber === 1) { //1進んだとき
-        //             anime({
-        //                 targets: uplist.map(up => `#camel-${up}`),
-        //                 translateX: `+= ${80}`,
-        //                 translateY: `-= ${25 * (newheightpositon - camel.heightposition)}`,
-        //                 easing: 'easeInOutSine',
-        //                 duration: 800,
-        //                 delay: 0,
-
-        //             })
-        //         }
-        //         else {
-        //             anime({
-        //                 targets: uplist.map(up => `#camel-${up}`),
-        //                 keyframes: [
-        //                     {
-        //                         translateX: `+= ${80}`,
-        //                         translateY: `+= ${25 * camel.heightposition}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     }, //一旦降りる処理
-        //                     {
-        //                         translateX: `+= ${80 * (newnumber - 2)}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     }, //降りた後進む処理
-        //                     {
-        //                         translateX: `+= ${80}`,
-        //                         translateY: `-= ${25 * newheightpositon}`,
-        //                         easing: 'easeInOutSine',
-        //                         duration: 800,
-        //                         delay: 0,
-        //                     } //乗る処理
-        //                 ],
-
-        //             });
-        //         }
-        //         const colorheightposition = camel.heightposition;
-        //         const colorposition = camel.position;
-        //         for (let i = 0; i < uplist.length; i++) {
-        //             this.$set(this.camels[uplist[i]], 'heightposition', newheightpositon - colorheightposition + this.camels[uplist[i]].heightposition);
-        //             this.$set(this.camels[uplist[i]], 'position', colorposition + newnumber);
+        
+        //     const direction = (color === 5 || color === 6) ? -1 : 1; // 灰色ダイスかどうか判定
+        //     const newPosition = camel.position + direction * newnumber;
+        //     const newHeightPosition = this.camels.filter(c => c.position === newPosition).length;
+        
+        //     // アニメーション処理
+        //     if (newnumber === 1) {
+        //         anime({
+        //             targets: uplist.map(up => `#camel-${up}`),
+        //             translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
+        //             translateY: `-= ${25 * (newHeightPosition - camel.heightposition)}`,
+        //             easing: 'easeInOutSine',
+        //             duration: 800,
+        //             delay: 0,
+        //         });
+        //     } else {
+        //         anime({
+        //             targets: uplist.map(up => `#camel-${up}`),
+        //             keyframes: [
+        //                 {
+        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
+        //                     translateY: `+= ${25 * camel.heightposition}`,
+        //                     easing: 'easeInOutSine',
+        //                     duration: 800,
+        //                     delay: 0,
+        //                 },//一旦降りる
+        //                 {
+        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80 * (newnumber - 2)}`,
+        //                     easing: 'easeInOutSine',
+        //                     duration: 800,
+        //                     delay: 0,
+        //                 },//降りた後進む
+        //                 {
+        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
+        //                     translateY: `-= ${25 * newHeightPosition}`,
+        //                     easing: 'easeInOutSine',
+        //                     duration: 800,
+        //                     delay: 0,
+        //                 }//乗る
+        //             ],
+        //         });
+        //     }
+        
+        //     // 高さと位置の更新
+        //     const originalHeightPosition = camel.heightposition;
+        //     const originalPosition = camel.position;
+        
+        //     for (let i = 0; i < uplist.length; i++) {
+        //         const upIndex = uplist[i];
+        //         const camelUp = this.camels[upIndex];
+        //         if (camelUp) {
+        //             this.$set(camelUp, 'heightposition', newHeightPosition - originalHeightPosition + camelUp.heightposition);
+        //             this.$set(camelUp, 'position', originalPosition + direction * newnumber);
         //         }
         //     }
         // },
+        
+        CamelMove(color, newnumber) { //駒のアニメーション
+            const camel = this.camels[color];
+            const uplist = [];
+            console.log("ラクダを動かします．")
+            for (let up = 0; up < 7; up++) {
+                const zindex = document.getElementById(`camel-${up}`);
+                if (camel.position === this.camels[up].position && camel.heightposition <= this.camels[up].heightposition){
+
+                    uplist.push(up);
+                    zindex.style.zIndex = this.camels[up].heightposition + 10;
+                }
+                else {
+                    zindex.style.zIndex = this.camels[up].heightposition;
+                }
+            }
+            if (color === 5 || color === 6) { //灰色ダイスが出たとき
+                const newheightpositon = this.camels.filter(c => c.position === camel.position - newnumber).length;
+                if (newnumber === 1) { //1進んだとき
+                    anime({
+                        targets: uplist.map(up => `#camel-${up}`),
+                        translateX: `-= ${80}`,
+                        translateY: `-= ${25 * (newheightpositon - camel.heightposition)}`,
+                        easing: 'easeInOutSine',
+                        duration: 800,
+                        delay: 0,
+
+                    })
+                }
+                else {
+                    anime({
+                        targets: uplist.map(up => `#camel-${up}`),
+                        keyframes: [
+                            {
+                                translateX: `-= ${80}`,
+                                translateY: `+= ${25 * camel.heightposition}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            }, //一旦降りる処理
+                            {
+                                translateX: `-= ${80 * (newnumber - 2)}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            }, //降りた後進む処理
+                            {
+                                translateX: `-= ${80}`,
+                                translateY: `-= ${25 * newheightpositon}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            } //乗る処理
+                        ],
+
+                    });
+                }
+                const colorheightposition = camel.heightposition;
+                const colorposition = camel.position;
+                for (let i = 0; i < uplist.length; i++) {
+                    this.$set(this.camels[uplist[i]], 'heightposition', newheightpositon - colorheightposition + this.camels[uplist[i]].heightposition);
+                    this.$set(this.camels[uplist[i]], 'position', colorposition - newnumber);
+                }
+            }
+            else { //灰色ダイス以外が出たとき
+                const newheightpositon = this.camels.filter(c => c.position === camel.position + newnumber).length;
+                if (newnumber === 1) { //1進んだとき
+                    anime({
+                        targets: uplist.map(up => `#camel-${up}`),
+                        translateX: `+= ${80}`,
+                        translateY: `-= ${25 * (newheightpositon - camel.heightposition)}`,
+                        easing: 'easeInOutSine',
+                        duration: 800,
+                        delay: 0,
+
+                    })
+                }
+                else {
+                    anime({
+                        targets: uplist.map(up => `#camel-${up}`),
+                        keyframes: [
+                            {
+                                translateX: `+= ${80}`,
+                                translateY: `+= ${25 * camel.heightposition}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            }, //一旦降りる処理
+                            {
+                                translateX: `+= ${80 * (newnumber - 2)}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            }, //降りた後進む処理
+                            {
+                                translateX: `+= ${80}`,
+                                translateY: `-= ${25 * newheightpositon}`,
+                                easing: 'easeInOutSine',
+                                duration: 800,
+                                delay: 0,
+                            } //乗る処理
+                        ],
+
+                    });
+                }
+                const colorheightposition = camel.heightposition;
+                const colorposition = camel.position;
+                for (let i = 0; i < uplist.length; i++) {
+                    this.$set(this.camels[uplist[i]], 'heightposition', newheightpositon - colorheightposition + this.camels[uplist[i]].heightposition);
+                    this.$set(this.camels[uplist[i]], 'position', colorposition + newnumber);
+                }
+            }
+        },
 
         MinusMove(color) {
             const camel = this.camels[color];
@@ -799,10 +795,9 @@ socket.on("connect", () => {
     });
 });
 
-
 // サーバーからラクダの位置更新を受信
 socket.on("camelMoved", (data) => {
     console.log("受信したラクダの状態:", data.result.camel.color);
     createBoard(data); // 最新状態でボードを更新
-    app.CamelMove(data.result.camel.color, data.result.steps);
+    app.RollDice(data.result.camel.color, data.result.steps);
 });
