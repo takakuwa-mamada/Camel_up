@@ -53,7 +53,6 @@ const io = new Server(server);
 const PORT = 4000;
 app.use(express.static('public'));
 
-
 //スペース
 class space{
     constructor(num){
@@ -663,25 +662,26 @@ function ranking(){
 
 }
 
-// game();
-
-//接続中のプレーヤーからロールダイスイベントが来た時，そのダイスの出目と色をindex.jsに送信
+//接続中のプレーヤーからロールダイスイベントが来た時，そのダイスの出目と色をgame.jsに送信
 io.on("connection", (socket) => {
     console.log(`Player connected: ${socket.id}`);
-
+    
     // サイコロを振るイベント
     socket.on("rollDice", () => {
         const result = moveCamel();
         console.log("ラクダの移動結果:", result);
         socket.broadcast.emit("camelMoved", { result }); // 最新のラクダ状態を全クライアントに送信
-        socket.emit("camelMoved", { result });
+        socket.emit("camelMoved", { result });//個人
+    });
+    socket.on("test", () => {//テスト用(サーバ|クライアント|HTML間の疎通確認)
+        console.log("テスト");
     });
 
-    socket.on("disconnect", () => {
-        console.log(`Player disconnected: ${socket.id}`);
+    // 切断時の処理
+    socket.on('disconnect', () => {
+        console.log('A user disconnected:', socket.id);
     });
 });
-
 
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
