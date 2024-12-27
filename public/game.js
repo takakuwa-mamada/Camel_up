@@ -56,13 +56,12 @@ const camelColorMap = {
     black: 6  
 };
 
-
-function move() {
-    const diceRoll = rollDice(); // サイコロを振る
-    const randomCamelIndex = Math.floor(Math.random() * camels.length);
-    camels[randomCamelIndex].position += diceRoll; // ラクダを移動させる
-    return diceRoll; // サイコロの結果を返す
-}
+// function move() {
+//     const diceRoll = rollDice(); // サイコロを振る
+//     const randomCamelIndex = Math.floor(Math.random() * camels.length);
+//     camels[randomCamelIndex].position += diceRoll; // ラクダを移動させる
+//     return diceRoll; // サイコロの結果を返す
+// }
 const commands = [
     [
         { word: "▶サイコロをふる" },
@@ -271,27 +270,43 @@ const app = new Vue({
             }
         },
 
-        CommandClick(command_word) { //各コマンドを押したときの処理
-            // this.SoundEffect();
-            if (this.command_word == "joinButton"){
+        GetLegStart(){
+            this.command_flag = 0;
+            this.remaindice_count = 0;
+            this.tile_flag = 0;
 
+            for (let i = 0; i < 16; i++) {
+                if (i <= 3){
+                    this.$set(this.ticket_flag, i, 4);
+                    this.$set(this.playerticket, i, []);
+                }
+                if (i <= 6){
+                    this.$set(this.dice_flag, i, 0);
+                }
+                this.$set(this.tile_color, i, null);
             }
+        },
+
+        CommandClick(command_word) { //各コマンドを押したときの処理 この中で基本的に情報送る
+            this.SoundEffect();
             if (this.command_flag == 0) {
                 if (command_word === commands[0][0]) {
-                    // document.getElementById(command_word)("click", (e) => {
+                    //サイコロを振るを押した場合、ここからサーバーに情報を送る
                     socket.emit("rollDice");
-                    e.preventDefault();
+                    e.proventDefault();
                     e.stopPropagation();
-                    
                 }
                 else if (command_word === commands[0][1]) {
                     this.command_flag = 1;
+                    //チケットを取った。この後色選択
                 }
                 else if (command_word === commands[0][2]) {
                     this.command_flag = 2;
+                    //この後タイルの色選択
                 }
                 else {
                     this.command_flag = 3;
+                    //この後一位か最下位か選択
                 }
             }
             else if (this.command_flag == 1) {
@@ -299,49 +314,62 @@ const app = new Vue({
                     this.command_flag = 0;
                 }
                 else {
+                    let color;
                     if (command_word === commands[1][0]) {
-                        this.ticket_flag[0] -= 1;
-                        this.playerticket[this.playerturn - 1].push(this.tickets[0][this.ticket_flag[0]].image);
+                        //サーバーに0と送る（赤）
+                        color = 0;
                     }
                     else if (command_word === commands[1][1]) {
-                        this.ticket_flag[1] -= 1;
-                        this.playerticket[this.playerturn - 1].push(this.tickets[1][this.ticket_flag[1]].image);
+                        //サーバーに1と送る（青）
+                        color = 1;
                     }
                     else if (command_word === commands[1][2]) {
-                        this.ticket_flag[2] -= 1;
-                        this.playerticket[this.playerturn - 1].push(this.tickets[2][this.ticket_flag[2]].image);
+                        //サーバーに2と送る（緑）
+                        color = 2;
                     }
                     else if (command_word === commands[1][3]) {
-                        this.ticket_flag[3] -= 1;
-                        this.playerticket[this.playerturn - 1].push(this.tickets[3][this.ticket_flag[3]].image);
+                        //サーバーに3と送る（黄）
+                        color = 3;
                     }
                     else if (command_word === commands[1][4]) {
-                        this.ticket_flag[4] -= 1;
-                        this.playerticket[this.playerturn - 1].push(this.tickets[4][this.ticket_flag[4]].image);
+                        //サーバーに4と送る（紫）
+                        color = 4;
                     }
+                    socket.emit("legVote", {color});//ここ入力！！（パスワードとデータの送り方分からない）
+                    e.proventDefault();
+                    e.stopPropagation();
+
                     this.PlayerTurn();
                 }
             }
-            else if (this.command_flag == 2) {
+            else if (this.command_flag == 2) {//タイルのみCommandClickでデータ送らず、SelectTileで送る
                 if (command_word === commands[2][0]) {
                     this.tile_flag = 1;
+                    //+タイル選択
                 }
                 else if (command_word === commands[2][1]) {
                     this.tile_flag = 2;
+                    //-タイル選択
                 }
                 else if (command_word === commands[2][2]) {
                     this.command_flag = 0;
+                    //戻る
                 }
             }
             else if (this.command_flag == 3) {
                 if (command_word === commands[3][0]) {
                     this.command_flag = 4;
+                    //一位選択
+                    this.topbottom = 0;
                 }
                 else if (command_word === commands[3][1]) {
                     this.command_flag = 4;
+                    //最下位選択
+                    this.topbottom = 1;
                 }
                 else if (command_word === commands[3][2]) {
-                    this.command_flag = 0;
+                    this.command_flag = 0
+                    //戻る
                 }
             }
             else if (this.command_flag == 4) {
@@ -349,19 +377,42 @@ const app = new Vue({
                     this.command_flag = 3;
                 }
                 else {
+                    let color;
                     if (command_word === commands[1][0]) {
+                        //サーバーに0と送る（赤）
+                        color = 0;
                     }
                     else if (command_word === commands[1][1]) {
+                        //サーバーに1と送る（青）
+                        color = 1;
                     }
                     else if (command_word === commands[1][2]) {
+                        //サーバーに2と送る（緑）
+                        color = 2;
                     }
                     else if (command_word === commands[1][3]) {
+                        //サーバーに3と送る（黄）
+                        color = 3;
                     }
                     else if (command_word === commands[1][4]) {
+                        //サーバーに4と送る（紫）
+                        color = 4;
                     }
+
+                    const vote = [color, this.topbottom];
+                    socket.emit("legVote", {vote});
+                    e.proventDefault();
+                    e.stopPropagation();
+
                     this.PlayerTurn();
                 }
             }
+        },
+
+        GetLegTicket(color) {
+            ticketcolor = camelColorMap[color];
+            this.ticket_flag[ticketcolor] -= 1;
+            this.playerticket[this.playerturn - 1].push(this.tickets[ticketcolor][this.ticket_flag[ticketcolor]].image);
         },
 
         SelectTile(mass_index) {
@@ -372,7 +423,7 @@ const app = new Vue({
                 const tilecolor = this.tile_color[mass_index];
                 if (tilecolor !== null) return;
 
-                if (this.tile_flag === 1) {
+                /*if (this.tile_flag === 1) {
                     if (targetmass) {
                         targetmass.style.background = "#0f0";
                         this.tile_color[mass_index] = "#0f0";
@@ -387,8 +438,30 @@ const app = new Vue({
                         this.tile_color[mass_index - 1] = "";
                         this.tile_color[mass_index + 1] = "";
                     }
-                }
+                }*/
                 this.tile_flag = 0;
+                //ここでサーバーに+1か-1かと場所を送る（tile_flagとmass_index+1を送る）
+                const tile = [mass_index + 1, tile_flag];
+                socket.emit("setTile", {tile});
+                e.proventDefault();
+                e.stopPropagation();
+            }
+        },
+
+        GetTileColor(color, place) {
+            const colorcode = "";
+            if (color === 1) {
+                colorcode = "0f0";
+            }
+            else {
+                colorcode = "f00";
+            }
+            const targetmass = document.getElementById(`mass-${place}`);
+            if (targetmass) {
+                targetmass.style.background = colorcode;
+                this.tile_color[place - 1] = colorcode;
+                this.tile_color[place - 2] = "";
+                this.tile_color[place] = "";
             }
         },
 
@@ -428,6 +501,11 @@ const app = new Vue({
                     targetmass.style.background = "";
                 }
             }
+        },
+
+        GetForecast() {
+            this.topforecast_count += 1;
+            this.bottomforecast_count += 1;
         },
 
         StartPosition(color) { //駒の初期位置決定
