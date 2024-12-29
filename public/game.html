@@ -18,15 +18,15 @@
             <div class="top">
                 <table class="point"> <!--得点欄-->
                     <tr>
-                        <td v-if="playerturn === 1" class="turn">・</td>
-                        <td v-if="playerturn !== 1" class="turn"> </td>
-                        <td class="name">player 1</td>
-                        <td class="money">10 coin</td>
+                        <td v-if="playerturn === 0" class="turn">・</td>
+                        <td v-if="playerturn !== 0" class="turn"> </td>
+                        <td class="name">{{playername[0]}}</td>
+                        <td class="money">{{playercoin[0]}} coin</td>
                         <td>
                             <div class="box_hover">
                                 <img class="ticket_box" src="ticket_box.png">
                                 <span class="check">
-                                    <p class="playername">player 1</p>
+                                    <p class="playername">{{playername[0]}}</p>
                                     <p class="nothave" v-if="playerticket[0].length === 0">現在は何も所持していません</p>
                                     <div class="check_imgs">
                                         <img class="check_img" v-if="playerticket[0].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[0]" :key="p_ticket_index" :src="playerticket[0][p_ticket_index]">
@@ -37,15 +37,15 @@
                         
                     </tr>
                     <tr>
-                        <td v-if="playerturn === 2" class="turn">・</td>
-                        <td v-if="playerturn !== 2" class="turn"> </td>
-                        <td class="name">player 2</td>
-                        <td class="money">3 coin</td>
+                        <td v-if="playerturn === 1" class="turn">・</td>
+                        <td v-if="playerturn !== 1" class="turn"> </td>
+                        <td class="name">{{playername[1]}}</td>
+                        <td class="money">{{playercoin[1]}} coin</td>
                         <td>
                             <div class="box_hover">
                                 <img class="ticket_box" src="ticket_box.png">
                                 <span class="check">
-                                    <p class="playername">player 2</p>
+                                    <p class="playername">{{playername[1]}}</p>
                                     <p class="nothave" v-if="playerticket[1].length === 0">現在は何も所持していません</p>
                                     <div class="check_imgs">
                                         <img class="check_img" v-if="playerticket[1].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[1]" :key="p_ticket_index" :src="playerticket[1][p_ticket_index]">
@@ -55,15 +55,15 @@
                         </td>
                     </tr>
                     <tr>
-                        <td v-if="playerturn === 3" class="turn">・</td>
-                        <td v-if="playerturn !== 3" class="turn"> </td>
-                        <td class="name">player 3</td>
-                        <td class="money">8 coin</td>
+                        <td v-if="playerturn === 2" class="turn">・</td>
+                        <td v-if="playerturn !== 2" class="turn"> </td>
+                        <td class="name">{{playername[2]}}</td>
+                        <td class="money">{{playercoin[2]}} coin</td>
                         <td>
                             <div class="box_hover">
                                 <img class="ticket_box" src="ticket_box.png">
                                 <span class="check">
-                                    <p class="playername">player 3</p>
+                                    <p class="playername">{{playername[2]}}</p>
                                     <p class="nothave" v-if="playerticket[2].length === 0">現在は何も所持していません</p>
                                     <div class="check_imgs">
                                         <img class="check_img" v-if="playerticket[2].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[2]" :key="p_ticket_index" :src="playerticket[2][p_ticket_index]">
@@ -73,15 +73,15 @@
                         </td>
                     </tr>
                     <tr>
-                        <td v-if="playerturn === 4" class="turn">・</td>
-                        <td v-if="playerturn !== 4" class="turn"> </td>
-                        <td class="name">player 4</td>
-                        <td class="money">15 coin</td>
+                        <td v-if="playerturn === 3" class="turn">・</td>
+                        <td v-if="playerturn !== 3" class="turn"> </td>
+                        <td class="name">{{playername[3]}}</td>
+                        <td class="money">{{playercoin[3]}} coin</td>
                         <td>
                             <div class="box_hover">
                                 <img class="ticket_box" src="ticket_box.png">
                                 <span class="check">
-                                    <p class="playername">player 4</p>
+                                    <p class="playername">{{playername[3]}}</p>
                                     <p class="nothave" v-if="playerticket[3].length === 0">現在は何も所持していません</p>
                                     <div class="check_imgs">
                                         <img class="check_img" v-if="playerticket[3].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[3]" :key="p_ticket_index" :src="playerticket[3][p_ticket_index]">
@@ -172,7 +172,7 @@
                         <!--駒-->
                         <img v-for="(camel, color) in camels" :key="color" class="camelsize" :id="'camel-' + color" :src="camel.image" :style="StartPosition(color)">
                     </div>
-                    <div  class="command_place"><!--v-if="playerturn === 1"-->
+                    <div  class="command_place" v-if="myturn === 1">
                         <div  v-for="(command, command_index) in commands[0]" v-if="command_flag === 0" class="command" :key="command_index">
                             <!--<p id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</p>-->
                             <button type="button" id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
