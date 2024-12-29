@@ -32,17 +32,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+//入力された名前をサーバーに送る動作
+const myname = "";
+function SendName() {
+    myname = document.getElementById("initial").value;
+    if (myname.length === 0) {
+        alert("名前は1文字以上記入してください");
+    }
+    else {
+        socket.emit("request", { myname });
+        e.proventDefault();
+        e.stopPropagation();
+    }
+};
+
 // 4人集まるまでボタン無効化(高鍬)
 // document.getElementById('startButton').disabled = true;
 
 const camels = [
     { image: "camellist/redCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //赤
-    { image: "camellist/blueCamel.png", position: 1, startposition: 1, heightposition: 1, startheightposition: 1 }, //青
-    { image: "camellist/greenCamel.png", position: 3, startposition: 3, heightposition: 0, startheightposition: 0 }, //緑
-    { image: "camellist/yellowCamel.png", position: 1, startposition: 1, heightposition: 2, startheightposition: 2 }, //黄
-    { image: "camellist/purpleCamel.png", position: 2, startposition: 2, heightposition: 0, startheightposition: 0 }, //紫
-    { image: "camellist/whiteCamel.png", position: 16, startposition: 16, heightposition: 0, startheightposition: 0 }, //白
-    { image: "camellist/blackCamel.png", position: 15, startposition: 15, heightposition: 0, startheightposition: 0 }, //黒
+    { image: "camellist/blueCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //青
+    { image: "camellist/greenCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //緑
+    { image: "camellist/yellowCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //黄
+    { image: "camellist/purpleCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //紫
+    { image: "camellist/whiteCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //白
+    { image: "camellist/blackCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //黒
 ];
 // 追加(高鍬)
 // 色名とインデックスのマッピング
@@ -313,7 +327,7 @@ const app = new Vue({
                         //サーバーに4と送る（紫）
                         color = 4;
                     }
-                    socket.emit("legVote", { color });//ここ入力！！（パスワードとデータの送り方分からない）
+                    socket.emit("legVote", { color });
                     e.proventDefault();
                     e.stopPropagation();
                 }
@@ -478,10 +492,10 @@ const app = new Vue({
         },
 
         GetForecast(number) {
-            if (number === 0){
+            if (number === 0) {
                 this.topforecast_count += 1;
             }
-            else if (number === 1){
+            else if (number === 1) {
                 this.bottomforecast_count += 1;
             }
         },
@@ -801,7 +815,7 @@ const app = new Vue({
             }
         },
 
-        GetData(){//あとキャメルのスタートポジションのデータを送ってもらう
+        GetData() {//あとキャメルのスタートポジションのデータを送ってもらう
             var dicecolor;
             var dicenumber;
             var tilecolor;
@@ -829,12 +843,17 @@ const app = new Vue({
                 this.GetForecast(data);
             });
             socket.on("gameStart", (data) => {
-                for (let i = 0; i < 4; i++){
+                for (let i = 0; i < 4; i++) {
                     this.playername[i] = data[i][0];
-                    if (myname === data[i][0]){
+                    if (myname === data[i][0]) {
                         this.myturnnumber = i;
                     }
                 }
+            });
+            socket.on("setCamel", (data) => {
+                data; //もらったデータ処理をする
+                const startID = document.querySelector('#initial');
+                startID.style.display = 'none';
             });
             socket.on("legStart", () => {
                 this.GetLegStart();
@@ -844,8 +863,8 @@ const app = new Vue({
                 this.playerturn = this.myturnnumber;
             });
             socket.on("otherTurn", (data) => {
-                for (let i = 0; i < 4; i++){
-                    if (data[0] === this.playername[i]){
+                for (let i = 0; i < 4; i++) {
+                    if (data[0] === this.playername[i]) {
                         this.playerturn = i;
                         break;
                     }
@@ -853,12 +872,12 @@ const app = new Vue({
                 this.myturn = 0;
             });
             socket.on("legPoint", (data) => {
-                for (let i = 0; i < 4; i++){
+                for (let i = 0; i < 4; i++) {
                     this.playercoin[i] = data[i][1];
                 }
             });
             socket.on("gamePoint", (data) => {//rankingに変わるかも、ほだか次第
-                for (let i = 0; i < 4; i++){
+                for (let i = 0; i < 4; i++) {
                     this.playercoin[i] = data[i][1];
                 }
             });
