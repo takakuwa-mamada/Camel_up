@@ -52,8 +52,8 @@ const camelColorMap = {
     green: 2,
     yellow: 3,
     purple: 4,
-    white: 5, 
-    black: 6  
+    white: 5,
+    black: 6
 };
 
 // function move() {
@@ -190,19 +190,15 @@ const app = new Vue({
         topforecast_count: 0, //今一位予想が何枚あるのか
         bottomforecast_count: 0,//今最下位予想が何枚あるのか
 
-        playerturn: 1,//自分のターンでは1、それ以外では0とし、自分のターン以外ではコマンドが出ないようにする
+        playerturn: 0,//上のプレイヤーから0,1,2,3
+        myturn: 0,//自分のターンが来ると1、それ以外では0
+        myturnnumber: 10, //自分が何番目か把握（0, 1, 2, 3いずれか） これどこで把握しよう自分の番号
+        playername: [],
+        playercoin: [0, 0, 0, 0],
+
         gif: "",
     },
     methods: {
-        PlayerTurn() {
-            if (this.playerturn == 4) {
-                this.playerturn = 1;
-            }
-            else {
-                this.playerturn += 1;
-            }
-        },
-
         SoundEffect() { //コマンド押したときの効果音
             const sound = new Audio("sound_effect.mp3");
             sound.volume = 0.3;
@@ -219,68 +215,50 @@ const app = new Vue({
             }, 6000);
         },
 
-        Rollreset() { //チェック用　後で消す
-            for (let i = 0; i < 7; i++) {
-                this.$set(this.dice_flag, i, 0);
+        GetRollDice(dicecolor, number) { //サイコロを振った時の処理
+            console.log(dicecolor)
+            console.log(number)
+            // colorが文字列の場合、インデックスに変換する
+            if (typeof dicecolor === 'string') {
+                color = camelColorMap[dicecolor];
             }
-            this.remaindice_count = 0;
-        },
-
-        RollDice(dicecolor,number) { //サイコロを振った時の処理
-            // console.log(remaindice_count);
-            while (this.remaindice_count <= 4) {
-                console.log(dicecolor)
-                console.log(number)
-                // colorが文字列の場合、インデックスに変換する
-                if (typeof dicecolor === 'string') {
-                    color = camelColorMap[dicecolor];
-                }
-                console.log(color);
-                if (this.dice_flag[color] === 0) {
-                    //this.DiceMovie(dicecolor, dicenumber);
-                    setTimeout(() => {
-                        this.CamelMove(color, number);
-                        if (this.tile_color[camels[color].position - 1] === "#0f0") { //緑タイルを踏んだ時
-                            setTimeout(() => {
-                                this.CamelMove(color, 1);
-                            }, 5000);
-                        }
-                        else if (this.tile_color[camels[color].position - 1] === "#f00") { //赤タイルを踏んだ時
-                            setTimeout(() => {
-                                this.MinusMove(color);
-                            }, 2500);
-                        }
-                        if (color !== 6) {
-                            this.$set(this.dice_flag, color, 1);
-                        }
-                        else {
-                            this.$set(this.dice_flag, 5, 1);
-                        }
-                        this.remaindice_count += 1;
-                        this.PlayerTurn();
-                    }, 5000);
-                    break;
-                }
-                else {
-                    continue;
-                }
-            }
-            if (this.remaindice_count == 5) {
-                this.Rollreset();
+            console.log(color);
+            if (this.dice_flag[color] === 0) {
+                this.DiceMovie(dicecolor, dicenumber);
+                setTimeout(() => {
+                    this.CamelMove(color, number);
+                    if (this.tile_color[camels[color].position - 1] === "#0f0") { //緑タイルを踏んだ時
+                        setTimeout(() => {
+                            this.CamelMove(color, 1);
+                        }, 5000);
+                    }
+                    else if (this.tile_color[camels[color].position - 1] === "#f00") { //赤タイルを踏んだ時
+                        setTimeout(() => {
+                            this.MinusMove(color);
+                        }, 2500);
+                    }
+                    if (color !== 6) {
+                        this.$set(this.dice_flag, color, 1);
+                    }
+                    else {
+                        this.$set(this.dice_flag, 5, 1);
+                    }
+                    this.remaindice_count += 1;
+                }, 5000);
             }
         },
 
-        GetLegStart(){
+        GetLegStart() {
             this.command_flag = 0;
             this.remaindice_count = 0;
             this.tile_flag = 0;
 
             for (let i = 0; i < 16; i++) {
-                if (i <= 3){
+                if (i <= 3) {
                     this.$set(this.ticket_flag, i, 4);
                     this.$set(this.playerticket, i, []);
                 }
-                if (i <= 6){
+                if (i <= 6) {
                     this.$set(this.dice_flag, i, 0);
                 }
                 this.$set(this.tile_color, i, null);
@@ -335,11 +313,9 @@ const app = new Vue({
                         //サーバーに4と送る（紫）
                         color = 4;
                     }
-                    socket.emit("legVote", {color});//ここ入力！！（パスワードとデータの送り方分からない）
+                    socket.emit("legVote", { color });//ここ入力！！（パスワードとデータの送り方分からない）
                     e.proventDefault();
                     e.stopPropagation();
-
-                    this.PlayerTurn();
                 }
             }
             else if (this.command_flag == 2) {//タイルのみCommandClickでデータ送らず、SelectTileで送る
@@ -400,11 +376,9 @@ const app = new Vue({
                     }
 
                     const vote = [color, this.topbottom];
-                    socket.emit("legVote", {vote});
+                    socket.emit("legVote", { vote });
                     e.proventDefault();
                     e.stopPropagation();
-
-                    this.PlayerTurn();
                 }
             }
         },
@@ -412,7 +386,7 @@ const app = new Vue({
         GetLegTicket(color) {
             ticketcolor = camelColorMap[color];
             this.ticket_flag[ticketcolor] -= 1;
-            this.playerticket[this.playerturn - 1].push(this.tickets[ticketcolor][this.ticket_flag[ticketcolor]].image);
+            this.playerticket[this.playerturn].push(this.tickets[ticketcolor][this.ticket_flag[ticketcolor]].image);
         },
 
         SelectTile(mass_index) {
@@ -442,7 +416,7 @@ const app = new Vue({
                 this.tile_flag = 0;
                 //ここでサーバーに+1か-1かと場所を送る（tile_flagとmass_index+1を送る）
                 const tile = [mass_index + 1, tile_flag];
-                socket.emit("setTile", {tile});
+                socket.emit("setTile", { tile });
                 e.proventDefault();
                 e.stopPropagation();
             }
@@ -503,9 +477,13 @@ const app = new Vue({
             }
         },
 
-        GetForecast() {
-            this.topforecast_count += 1;
-            this.bottomforecast_count += 1;
+        GetForecast(number) {
+            if (number === 0){
+                this.topforecast_count += 1;
+            }
+            else if (number === 1){
+                this.bottomforecast_count += 1;
+            }
         },
 
         StartPosition(color) { //駒の初期位置決定
@@ -531,17 +509,17 @@ const app = new Vue({
             }
         },
         // CamelMove(color, newnumber) { //駒のアニメーション
-        
+
         //     const camel = this.camels[color];
         //     const uplist = [];
         //     console.log("ラクダを動かします．");
-            
+
         //     for (let up = 0; up < this.camels.length; up++) {
         //         const camelUp = this.camels[up];
         //         const zindex = document.getElementById(`camel-${up}`);
-        
+
         //         if (!camelUp) continue;
-        
+
         //         if (camel.position === camelUp.position && camel.heightposition <= camelUp.heightposition) {
         //             uplist.push(up);
         //             if (zindex) zindex.style.zIndex = camelUp.heightposition + 10;
@@ -549,11 +527,11 @@ const app = new Vue({
         //             if (zindex) zindex.style.zIndex = camelUp.heightposition;
         //         }
         //     }
-        
+
         //     const direction = (color === 5 || color === 6) ? -1 : 1; // 灰色ダイスかどうか判定
         //     const newPosition = camel.position + direction * newnumber;
         //     const newHeightPosition = this.camels.filter(c => c.position === newPosition).length;
-        
+
         //     // アニメーション処理
         //     if (newnumber === 1) {
         //         anime({
@@ -591,11 +569,11 @@ const app = new Vue({
         //             ],
         //         });
         //     }
-        
+
         //     // 高さと位置の更新
         //     const originalHeightPosition = camel.heightposition;
         //     const originalPosition = camel.position;
-        
+
         //     for (let i = 0; i < uplist.length; i++) {
         //         const upIndex = uplist[i];
         //         const camelUp = this.camels[upIndex];
@@ -605,14 +583,14 @@ const app = new Vue({
         //         }
         //     }
         // },
-        
+
         CamelMove(color, newnumber) { //駒のアニメーション
             const camel = this.camels[color];
             const uplist = [];
             console.log("ラクダを動かします．")
             for (let up = 0; up < 7; up++) {
                 const zindex = document.getElementById(`camel-${up}`);
-                if (camel.position === this.camels[up].position && camel.heightposition <= this.camels[up].heightposition){
+                if (camel.position === this.camels[up].position && camel.heightposition <= this.camels[up].heightposition) {
 
                     uplist.push(up);
                     zindex.style.zIndex = this.camels[up].heightposition + 10;
@@ -821,6 +799,69 @@ const app = new Vue({
                     }
                 }
             }
+        },
+
+        GetData(){//あとキャメルのスタートポジションのデータを送ってもらう
+            var dicecolor;
+            var dicenumber;
+            var tilecolor;
+            var tileplace;
+            socket.on("rolldice", (data) => {
+                dicecolor = data[0];
+                dicenumber = data[1];
+                this.GetRollDice(dicecolor, dicenumber);
+            });
+            socket.on("DiceEP", (data) => {
+                this.playercoin[playerturn] = data[1];
+            });
+            // socket.on("onTile", (data) => {
+            //     河野は使わないけど、ログで使うんじゃないかな
+            // })
+            socket.on("legVote", (data) => {
+                this.GetLegTicket(data);
+            });
+            socket.on("setTile", (data) => {
+                tilecolor = data[0];
+                tileplace = data[1];
+                this.GetTileColor(tilecolor, tileplace);
+            });
+            socket.on("finalVote", (data) => {
+                this.GetForecast(data);
+            });
+            socket.on("gameStart", (data) => {
+                for (let i = 0; i < 4; i++){
+                    this.playername[i] = data[i][0];
+                    if (myname === data[i][0]){
+                        this.myturnnumber = i;
+                    }
+                }
+            });
+            socket.on("legStart", () => {
+                this.GetLegStart();
+            });
+            socket.on("yourTurn", () => {
+                this.myturn = 1;
+                this.playerturn = this.myturnnumber;
+            });
+            socket.on("otherTurn", (data) => {
+                for (let i = 0; i < 4; i++){
+                    if (data[0] === this.playername[i]){
+                        this.playerturn = i;
+                        break;
+                    }
+                }
+                this.myturn = 0;
+            });
+            socket.on("legPoint", (data) => {
+                for (let i = 0; i < 4; i++){
+                    this.playercoin[i] = data[i][1];
+                }
+            });
+            socket.on("gamePoint", (data) => {//rankingに変わるかも、ほだか次第
+                for (let i = 0; i < 4; i++){
+                    this.playercoin[i] = data[i][1];
+                }
+            });
         }
     }
 });
