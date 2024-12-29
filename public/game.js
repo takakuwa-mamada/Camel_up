@@ -853,7 +853,9 @@ const app = new Vue({
             socket.on("setCamel", (data) => {
                 data; //もらったデータ処理をする
                 const startID = document.querySelector('#initial');
+                const gameID = document.getElementById("app");
                 startID.style.display = 'none';
+                gameID.style.display = "block";
             });
             socket.on("legStart", () => {
                 this.GetLegStart();
