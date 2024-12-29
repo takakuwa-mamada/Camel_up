@@ -11,6 +11,10 @@ body {
     display: block;
 }
 
+#app {
+    display: none;
+}
+
 .logo {
     font-size: 60px;
     position: absolute;
