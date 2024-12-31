@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //入力された名前をサーバーに送る動作
 let myname = "";
 function SendName() {
-    myname = document.getElementById("initial").value;
+    myname = document.getElementById("playername").value;
     if (myname.length === 0) {
         alert("名前は1文字以上記入してください");
     }
