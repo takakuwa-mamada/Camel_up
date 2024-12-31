@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //入力された名前をサーバーに送る動作
-const myname = "";
+let myname = "";
 function SendName() {
     myname = document.getElementById("initial").value;
     if (myname.length === 0) {
@@ -41,8 +41,6 @@ function SendName() {
     }
     else {
         socket.emit("request", { myname });
-        e.proventDefault();
-        e.stopPropagation();
     }
 };
 
@@ -145,7 +143,7 @@ const remaindices = [
     { image: "dicelist/dice_gray.png", word: "graydice" },
 ];
 
-const dicemovie = [ //gifファイル作成途中．現在5個まで終わっており，残り16個．ただ，gifファイルが重い
+const dicemovie = [
     [
         { movie: "dicemovie/reddice_1.gif" },
         { movie: "dicemovie/reddice_2.gif" },
@@ -285,8 +283,6 @@ const app = new Vue({
                 if (command_word === commands[0][0]) {
                     //サイコロを振るを押した場合、ここからサーバーに情報を送る
                     socket.emit("rollDice");
-                    e.proventDefault();
-                    e.stopPropagation();
                 }
                 else if (command_word === commands[0][1]) {
                     this.command_flag = 1;
@@ -328,8 +324,6 @@ const app = new Vue({
                         color = 4;
                     }
                     socket.emit("legVote", { color });
-                    e.proventDefault();
-                    e.stopPropagation();
                 }
             }
             else if (this.command_flag == 2) {//タイルのみCommandClickでデータ送らず、SelectTileで送る
@@ -391,8 +385,6 @@ const app = new Vue({
 
                     const vote = [color, this.topbottom];
                     socket.emit("legVote", { vote });
-                    e.proventDefault();
-                    e.stopPropagation();
                 }
             }
         },
@@ -431,8 +423,6 @@ const app = new Vue({
                 //ここでサーバーに+1か-1かと場所を送る（tile_flagとmass_index+1を送る）
                 const tile = [mass_index + 1, tile_flag];
                 socket.emit("setTile", { tile });
-                e.proventDefault();
-                e.stopPropagation();
             }
         },
 
@@ -937,7 +927,7 @@ function addChatMessage(message) {
 //     document.getElementById("aaa").addEventListener("click", (e) => {
 //         socket.emit(key);
 //         e.preventDefault();
-//         e.stopPropagation();
+//   
 //     });
 // });
 
