@@ -41,6 +41,8 @@ function SendName() {
     }
     else {
         socket.emit("request", { myname });
+        document.getElementById("name_set").style.display = "none";
+        document.getElementById("loading-bg").style.display = "block";
     }
 };
 
