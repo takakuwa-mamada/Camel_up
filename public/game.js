@@ -51,12 +51,12 @@ function SendName() {
 
 const camels = [
     { image: "camellist/redCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //赤
-    { image: "camellist/blueCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //青
-    { image: "camellist/greenCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //緑
-    { image: "camellist/yellowCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //黄
-    { image: "camellist/purpleCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //紫
-    { image: "camellist/whiteCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //白
-    { image: "camellist/blackCamel.png", position: 1, startposition: 1, heightposition: 0, startheightposition: 0 }, //黒
+    { image: "camellist/blueCamel.png", position: 1, startposition: 1, heightposition: 1, startheightposition: 1 }, //青
+    { image: "camellist/greenCamel.png", position: 3, startposition: 3, heightposition: 0, startheightposition: 0 }, //緑
+    { image: "camellist/yellowCamel.png", position: 1, startposition: 1, heightposition: 2, startheightposition: 2 }, //黄
+    { image: "camellist/purpleCamel.png", position: 2, startposition: 2, heightposition: 0, startheightposition: 0 }, //紫
+    { image: "camellist/whiteCamel.png", position: 16, startposition: 16, heightposition: 0, startheightposition: 0 }, //白
+    { image: "camellist/blackCamel.png", position: 15, startposition: 15, heightposition: 0, startheightposition: 0 }, //黒
 ];
 // 追加(高鍬)
 // 色名とインデックスのマッピング
@@ -207,7 +207,7 @@ const app = new Vue({
         playerturn: 0,//上のプレイヤーから0,1,2,3
         myturn: 0,//自分のターンが来ると1、それ以外では0
         myturnnumber: 10, //自分が何番目か把握（0, 1, 2, 3いずれか） これどこで把握しよう自分の番号
-        playername: [],
+        playername: ["player 1", "player 2", "player 3", "player 4"],
         playercoin: [0, 0, 0, 0],
 
         gif: "",
@@ -230,13 +230,13 @@ const app = new Vue({
         },
 
         GetRollDice(dicecolor, number) { //サイコロを振った時の処理
-            console.log(dicecolor)
-            console.log(number)
+            console.log(dicecolor);
+            console.log(number);
             // colorが文字列の場合、インデックスに変換する
+            var color = 0;
             if (typeof dicecolor === 'string') {
                 color = camelColorMap[dicecolor];
             }
-            console.log(color);
             if (this.dice_flag[color] === 0) {
                 this.DiceMovie(color, number);
                 setTimeout(() => {
@@ -392,9 +392,8 @@ const app = new Vue({
         },
 
         GetLegTicket(color) {
-            ticketcolor = camelColorMap[color];
-            this.ticket_flag[ticketcolor] -= 1;
-            this.playerticket[this.playerturn].push(this.tickets[ticketcolor][this.ticket_flag[ticketcolor]].image);
+            this.ticket_flag[color] -= 1;
+            this.playerticket[this.playerturn].push(this.tickets[color][this.ticket_flag[color]].image);
         },
 
         SelectTile(mass_index) {
@@ -422,7 +421,7 @@ const app = new Vue({
                     }
                 }*/
                 //ここでサーバーに+1か-1かと場所を送る（tile_flagとmass_index+1を送る）
-                const tile = [mass_index + 1, tile_flag];
+                const tile = [mass_index + 1, this.tile_flag];
                 socket.emit("setTile", tile);
                 this.tile_flag = 0;
             }
@@ -514,81 +513,6 @@ const app = new Vue({
                 }
             }
         },
-        // CamelMove(color, newnumber) { //駒のアニメーション
-
-        //     const camel = this.camels[color];
-        //     const uplist = [];
-        //     console.log("ラクダを動かします．");
-
-        //     for (let up = 0; up < this.camels.length; up++) {
-        //         const camelUp = this.camels[up];
-        //         const zindex = document.getElementById(`camel-${up}`);
-
-        //         if (!camelUp) continue;
-
-        //         if (camel.position === camelUp.position && camel.heightposition <= camelUp.heightposition) {
-        //             uplist.push(up);
-        //             if (zindex) zindex.style.zIndex = camelUp.heightposition + 10;
-        //         } else {
-        //             if (zindex) zindex.style.zIndex = camelUp.heightposition;
-        //         }
-        //     }
-
-        //     const direction = (color === 5 || color === 6) ? -1 : 1; // 灰色ダイスかどうか判定
-        //     const newPosition = camel.position + direction * newnumber;
-        //     const newHeightPosition = this.camels.filter(c => c.position === newPosition).length;
-
-        //     // アニメーション処理
-        //     if (newnumber === 1) {
-        //         anime({
-        //             targets: uplist.map(up => `#camel-${up}`),
-        //             translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-        //             translateY: `-= ${25 * (newHeightPosition - camel.heightposition)}`,
-        //             easing: 'easeInOutSine',
-        //             duration: 800,
-        //             delay: 0,
-        //         });
-        //     } else {
-        //         anime({
-        //             targets: uplist.map(up => `#camel-${up}`),
-        //             keyframes: [
-        //                 {
-        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-        //                     translateY: `+= ${25 * camel.heightposition}`,
-        //                     easing: 'easeInOutSine',
-        //                     duration: 800,
-        //                     delay: 0,
-        //                 },//一旦降りる
-        //                 {
-        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80 * (newnumber - 2)}`,
-        //                     easing: 'easeInOutSine',
-        //                     duration: 800,
-        //                     delay: 0,
-        //                 },//降りた後進む
-        //                 {
-        //                     translateX: `${direction === 1 ? "+=" : "-="} ${80}`,
-        //                     translateY: `-= ${25 * newHeightPosition}`,
-        //                     easing: 'easeInOutSine',
-        //                     duration: 800,
-        //                     delay: 0,
-        //                 }//乗る
-        //             ],
-        //         });
-        //     }
-
-        //     // 高さと位置の更新
-        //     const originalHeightPosition = camel.heightposition;
-        //     const originalPosition = camel.position;
-
-        //     for (let i = 0; i < uplist.length; i++) {
-        //         const upIndex = uplist[i];
-        //         const camelUp = this.camels[upIndex];
-        //         if (camelUp) {
-        //             this.$set(camelUp, 'heightposition', newHeightPosition - originalHeightPosition + camelUp.heightposition);
-        //             this.$set(camelUp, 'position', originalPosition + direction * newnumber);
-        //         }
-        //     }
-        // },
 
         CamelMove(color, newnumber) { //駒のアニメーション
             const camel = this.camels[color];
@@ -813,8 +737,8 @@ const app = new Vue({
             var tilecolor;
             var tileplace;
             socket.on("rollDice", (data) => {
-                dicecolor = data[0];
-                dicenumber = data[1];
+                dicecolor = data.color;
+                dicenumber = data.num;
                 this.GetRollDice(dicecolor, dicenumber);
             });
             socket.on("DiceEP", (data) => {
@@ -822,7 +746,7 @@ const app = new Vue({
             });
             socket.on("onTile", (data) => {
                 //河野は使わないけど、ログで使うんじゃないかな
-                data;
+                console.log(data);
             })
             socket.on("legVote", (data) => {
                 this.GetLegTicket(data);
@@ -877,11 +801,13 @@ const app = new Vue({
                 }
             });
             socket.on("ranking", (data) => {
-                data;
-            })
+                console.log(data);
+            });
         }
     }
 });
+
+app.GetData();
 
 function createBoard(camels) {
     // camelsが配列でない場合の対策
