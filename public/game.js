@@ -386,7 +386,7 @@ const app = new Vue({
                     }
 
                     const vote = [color, this.topbottom];
-                    socket.emit("legVote", { vote });
+                    socket.emit("finalVote", { vote });
                 }
             }
         },
@@ -421,10 +421,10 @@ const app = new Vue({
                         this.tile_color[mass_index + 1] = "";
                     }
                 }*/
-                this.tile_flag = 0;
                 //ここでサーバーに+1か-1かと場所を送る（tile_flagとmass_index+1を送る）
                 const tile = [mass_index + 1, tile_flag];
                 socket.emit("setTile", { tile });
+                this.tile_flag = 0;
             }
         },
 
@@ -813,12 +813,12 @@ const app = new Vue({
             var tilecolor;
             var tileplace;
             socket.on("rolldice", (data) => {
-                dicecolor = data[0];
-                dicenumber = data[1];
+                dicecolor = data.color;
+                dicenumber = data.num;
                 this.GetRollDice(dicecolor, dicenumber);
             });
             socket.on("DiceEP", (data) => {
-                this.playercoin[playerturn] = data[1];
+                this.playercoin[playerturn] = data.EP;
             });
             // socket.on("onTile", (data) => {
             //     河野は使わないけど、ログで使うんじゃないかな
@@ -827,8 +827,8 @@ const app = new Vue({
                 this.GetLegTicket(data);
             });
             socket.on("setTile", (data) => {
-                tilecolor = data[0];
-                tileplace = data[1];
+                tilecolor = data[1];
+                tileplace = data[0];
                 this.GetTileColor(tilecolor, tileplace);
             });
             socket.on("finalVote", (data) => {
@@ -836,8 +836,8 @@ const app = new Vue({
             });
             socket.on("gameStart", (data) => {
                 for (let i = 0; i < 4; i++) {
-                    this.playername[i] = data[i][0];
-                    if (myname === data[i][0]) {
+                    this.playername[i] = data[i].name;
+                    if (myname === data[i].name) {
                         this.myturnnumber = i;
                     }
                 }
@@ -858,7 +858,7 @@ const app = new Vue({
             });
             socket.on("otherTurn", (data) => {
                 for (let i = 0; i < 4; i++) {
-                    if (data[0] === this.playername[i]) {
+                    if (data.name === this.playername[i]) {
                         this.playerturn = i;
                         break;
                     }
@@ -867,12 +867,12 @@ const app = new Vue({
             });
             socket.on("legPoint", (data) => {
                 for (let i = 0; i < 4; i++) {
-                    this.playercoin[i] = data[i][1];
+                    this.playercoin[i] = data[i].EP;
                 }
             });
             socket.on("gamePoint", (data) => {//rankingに変わるかも、ほだか次第
                 for (let i = 0; i < 4; i++) {
-                    this.playercoin[i] = data[i][1];
+                    this.playercoin[i] = data[i].EP;
                 }
             });
         }
