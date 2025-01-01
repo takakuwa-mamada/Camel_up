@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <title>B3横山研  camel up</title>
 
-        <link rel="stylesheet" href="game.css">
-        <script src="game.js" defer></script>
+        <link rel="stylesheet" href="game_test.css">
+        <script src="game_test.js" defer></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
@@ -24,7 +24,7 @@
                 </p>
             </div>
             <div class="tutorial">
-                <a href="https:">
+                <a href="https:" target="_blank" rel="noopener noreferrer">
                     how to play
                 </a>
             </div>
@@ -39,18 +39,18 @@
             <div id="loading-bg">
                 <div class="loading">
                     <div class="circle">
-                        <span><img src="camellist/redCamel.png" class="loading_camel"></span>
-                        <span>マ</span>
-                        <span>ッ</span>
-                        <span>チ</span>
-                        <span>ン</span>
-                        <span>グ</span>
-                        <span>中</span>
-                        <span>.</span>
-                        <span>.</span>
-                        <span>.</span>
-                        <span><img src="camellist/blueCamel.png" class="loading_camel"></span>
-                        <span><img src="camellist/yellowCamel.png" class="loading_camel"></span>
+                        <span class="loading_span"><img src="camellist/redCamel.png" class="loading_camel"></span>
+                        <span class="loading_span">マ</span>
+                        <span class="loading_span">ッ</span>
+                        <span class="loading_span">チ</span>
+                        <span class="loading_span">ン</span>
+                        <span class="loading_span">グ</span>
+                        <span class="loading_span">中</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span"><img src="camellist/blueCamel.png" class="loading_camel"></span>
+                        <span class="loading_span"><img src="camellist/yellowCamel.png" class="loading_camel"></span>
                     </div>
                 </div>
             </div>
@@ -195,10 +195,10 @@
                     <div class="camel_root">
                         <!--マス目-->
                         <div class="mass_set">
-                            <div v-for="(mass, mass_index) in cells" class="mass" :key="mass_index" :id="'mass-' + (mass_index + 1)">
+                            <div v-for="(mass, mass_index) in cells" class="mass" :id="'mass-' + (mass_index + 1)">
                                 <p>{{mass}}</p>
                             </div>
-                            <div v-for="(t_mass, t_mass_index) in cells" class="transparent_mass" :key="t_mass_index" :id="'t_mass-' + (t_mass_index + 1)" @click="SelectTile(t_mass_index)" @mouseenter="HoverTile(t_mass_index)" @mouseleave="LeaveTile(t_mass_index)">
+                            <div v-for="(t_mass, t_mass_index) in cells" class="transparent_mass" :id="'t_mass-' + (t_mass_index + 1)" @click="SelectTile(t_mass_index)" @mouseenter="HoverTile(t_mass_index)" @mouseleave="LeaveTile(t_mass_index)">
                             </div>
                         </div>
                         <div id="board"></div>
@@ -217,7 +217,7 @@
                         <!--駒-->
                         <img v-for="(camel, color) in camels" :key="color" class="camelsize" :id="'camel-' + color" :src="camel.image" :style="StartPosition(color)">
                     </div>
-                    <div  class="command_place" v-if="myturn === 1">
+                    <div  class="command_place">
                         <div  v-for="(command, command_index) in commands[0]" v-if="command_flag === 0" class="command" :key="command_index">
                             <!--<p id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</p>-->
                             <button type="button" id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
