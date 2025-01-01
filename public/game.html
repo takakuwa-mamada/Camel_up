@@ -28,11 +28,31 @@
                     how to play
                 </a>
             </div>
-            <div class="name_input">
-                <input type="text" id="playername" placeholder="プレイヤー名を入力" required>
+            <div id="name_set">
+                <div class="name_input">
+                    <input type="text" id="playername" placeholder="プレイヤー名を入力" required>
+                </div>
+                <div class="login">
+                    <input type="button" id="joinButton" name="login" value="マッチング開始" onclick="SendName()">
+                </div>
             </div>
-            <div class="login">
-                <input type="button" id="joinButton" name="login" value="マッチング開始" onclick="SendName()">
+            <div id="loading-bg">
+                <div class="loading">
+                    <div class="circle">
+                        <span><img src="camellist/redCamel.png" class="loading_camel"></span>
+                        <span>マ</span>
+                        <span>ッ</span>
+                        <span>チ</span>
+                        <span>ン</span>
+                        <span>グ</span>
+                        <span>中</span>
+                        <span>.</span>
+                        <span>.</span>
+                        <span>.</span>
+                        <span><img src="camellist/blueCamel.png" class="loading_camel"></span>
+                        <span><img src="camellist/yellowCamel.png" class="loading_camel"></span>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="app">
