@@ -241,12 +241,12 @@ const app = new Vue({
                 this.DiceMovie(color, number);
                 setTimeout(() => {
                     this.CamelMove(color, number);
-                    if (this.tile_color[camels[color].position - 1] === "#0f0") { //緑タイルを踏んだ時
+                    if (this.tile_color[camels[color].position - 1] === "0f0") { //緑タイルを踏んだ時
                         setTimeout(() => {
                             this.CamelMove(color, 1);
                         }, 5000);
                     }
-                    else if (this.tile_color[camels[color].position - 1] === "#f00") { //赤タイルを踏んだ時
+                    else if (this.tile_color[camels[color].position - 1] === "f00") { //赤タイルを踏んだ時
                         setTimeout(() => {
                             this.MinusMove(color);
                         }, 2500);
@@ -275,7 +275,12 @@ const app = new Vue({
                 if (i <= 6) {
                     this.$set(this.dice_flag, i, 0);
                 }
-                this.$set(this.tile_color, i, null);
+                if (i === 0) {
+                    this.$set(this.tile_color, i, "");
+                }
+                else {
+                    this.$set(this.tile_color, i, null);
+                }
             }
         },
 
@@ -339,6 +344,7 @@ const app = new Vue({
                 }
                 else if (command_word === commands[2][2]) {
                     this.command_flag = 0;
+                    this.tile_flag = 0;
                     //戻る
                 }
             }
@@ -401,7 +407,13 @@ const app = new Vue({
                 const targetmass = document.getElementById(`mass-${mass_index + 1}`);
                 if (!targetmass) return;
 
-                const tilecolor = this.tile_color[mass_index];
+                var tilecolor = this.tile_color[mass_index];
+                for (let i = 0; i < 7; i++){
+                    if (tilecolor === null && (camels[i].position - 1) === mass_index){
+                        tilecolor = "";
+                        break;
+                    }
+                }
                 if (tilecolor !== null) return;
 
                 /*if (this.tile_flag === 1) {
@@ -428,7 +440,7 @@ const app = new Vue({
         },
 
         GetTileColor(color, place) {
-            const colorcode = "";
+            var colorcode = "";
             if (color === 1) {
                 colorcode = "0f0";
             }
@@ -442,6 +454,9 @@ const app = new Vue({
                 this.tile_color[place - 2] = "";
                 this.tile_color[place] = "";
             }
+            console.log("タイル設置");
+            console.log(place);
+            console.log(colorcode);
         },
 
         HoverTile(mass_index) {
@@ -450,7 +465,13 @@ const app = new Vue({
                 if (!targetmass) {
                     return;
                 }
-                const tilecolor = this.tile_color[mass_index];
+                var tilecolor = this.tile_color[mass_index];
+                for (let i = 0; i < 7; i++){
+                    if (tilecolor === null && (camels[i].position - 1) === mass_index){
+                        tilecolor = "";
+                        break;
+                    }
+                }
                 if (tilecolor === null) {
                     if (this.tile_flag === 1) {
                         if (targetmass) {
@@ -521,7 +542,6 @@ const app = new Vue({
             for (let up = 0; up < 7; up++) {
                 const zindex = document.getElementById(`camel-${up}`);
                 if (camel.position === this.camels[up].position && camel.heightposition <= this.camels[up].heightposition) {
-
                     uplist.push(up);
                     zindex.style.zIndex = this.camels[up].heightposition + 10;
                 }
@@ -625,9 +645,12 @@ const app = new Vue({
                     this.$set(this.camels[uplist[i]], 'position', colorposition + newnumber);
                 }
             }
+            console.log("動いた後のタイルの色");
+            console.log(this.tile_color[camels[color].position - 1]);
         },
 
         MinusMove(color) {
+            console.log("ラクダが戻ります");
             const camel = this.camels[color];
             const uplist = [];
             const minuslist = [];
@@ -768,7 +791,7 @@ const app = new Vue({
                 }
             });
             socket.on("setCamel", (data) => {
-                for (let i = 0; i < 7; i++){
+                for (let i = 0; i < 7; i++) {
                     this.camels[i].position = data[i][0];
                     this.camels[i].startposition = data[i][0];
                     this.camels[i].heightposition = data[i][1] - 1;
