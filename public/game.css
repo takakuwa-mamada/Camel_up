@@ -296,7 +296,7 @@ body {
         transform: rotate(585deg);
     }
 }
-
+/*ここまでローディング部分*/
 
 .backgray {
     position: fixed;
@@ -324,12 +324,16 @@ body {
     flex-direction: row;
     justify-content: space-around;
     align-items: flex-start;
-    margin-top: 30px;
+    /*margin-top: 30px;*/
+    margin-top: 4vh;
+    height: 16.5vh;
 }
 
 .point {
-    width: 250px;
-    height: 120px;
+    /*width: 250px;*/
+    /*height: 120px;*/
+    width: 18%;
+    height: 100%;
     /*border: solid 1px #000;*/
     text-align: center;
     background: rgba(70, 206, 244, 0.3);
@@ -402,8 +406,10 @@ body {
 }
 
 .ticket {
-    width: 400px;
-    height: 120px;
+    /*width: 400px;
+    height: 120px;*/
+    width: 28.8%;
+    height: 100%;
     border: solid 1px rgba(3, 114, 145, 0.1);
     background: rgba(70, 206, 244, 0.3);
 
@@ -413,11 +419,13 @@ body {
 }
 
 .boxtitle {
-    margin-top: 5px;
+    /*margin-top: 5px;*/
+    margin-top: 1.5%;
 }
 
 .color_ticket {
     width: 100%;
+    height: 80%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -425,26 +433,32 @@ body {
 }
 
 .color_ticket>div {
-    width: 55px;
-    height: 65px;
+    /*width: 55px;
+    height: 65px;*/
+    width: 15%;
+    height: 100%;
     position: relative;
     overflow: visible;
 }
 
 .color_ticket>div p {
     position: absolute;
-    top: 80px;
+    /*top: 80px;*/
+    top: 11vh;
     font-size: small;
 }
 
 
 .ticket_picture {
-    width: 100%;
+    width: 90%;
     height: auto;
     position: absolute;
     display: block;
     transition-duration: 0.5s;
     z-index: 1;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .ticket_picture:hover {
@@ -455,8 +469,10 @@ body {
 }
 
 .dice {
-    width: 150px;
-    height: 120px;
+    /*width: 150px;
+    height: 120px;*/
+    width: 10.8%;
+    height: 100%;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -465,23 +481,28 @@ body {
 }
 
 .remain_dice {
+    width: 90%;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: space-around;
     align-items: center;
-    margin-top: 15px;
-    gap: 10px;
+    /*margin-top: 15px;*/
+    margin-top: 2vh;
+    /*gap: 10px;*/
+    gap: 0.72vw;
 }
 
 .dice_picture {
-    width: 20%;
+    width: 24%;
     height: auto;
 }
 
 .forecast {
-    width: 300px;
-    height: 120px;
+    /*width: 300px;
+    height: 120px;*/
+    width: 21.6%;
+    height: 100%;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -491,18 +512,19 @@ body {
 
 .first_camel,
 .lowest_camel {
-    width: 90px;
-    height: 100px;
-    margin-top: 10px;
+    width: 30%;
+    height: 83.33%;
+    margin-top: 0.66vh;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .card_count {
-    margin-top: 10px;
-    width: 90px;
-    height: 90px;
+    /*margin-top: 10px;*/
+    margin-top: 1.33vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -518,14 +540,14 @@ body {
 .forecast_number {
     font-size: 50px;
     position: absolute;
-    top: 10px;
+    top: 12%;
 }
 
 .mai {
     font-size: 15px;
     position: absolute;
-    right: -5px;
-    bottom: 5px;
+    right: -1%;
+    bottom: 1%;
 }
 
 .bottom {
@@ -533,43 +555,50 @@ body {
     flex-direction: row;
     justify-content: space-around;
     align-items: flex-start;
-    margin-top: 50px;
+    margin-top: 4%;
 }
 
 .stage {
     width: 100%;
-    height: 500px;
+    height: 70vh;
 }
 
 .log {
     width: 38%;
-    height: 200px;
+    height: 40%;
     border: solid 1px #000;
     background-color: rgba(0, 255, 242, 0.3);
     margin: 0 0 0 auto;
-    margin-right: 20px;
+    margin-right: 2%;
 }
 
 .log p {
     font-weight: bold;
-    margin-left: 10px;
-    font-size: 1.1rem;
+    margin-left: 2%;
+    font-size: 16px;
 }
 
 .camel_root {
     margin: 0 auto;
-    margin-top: 70px;
+    margin-top: 5%;
     width: 95%;
-    height: 130px;
-    left: 10px;
+    height: 25%;
+    left: 1.2%;
     position: relative;
+}
+
+.mass_set {
+    width: 96.3%;
+    height: 39.1%;
 }
 
 .mass {
     border: 1px solid black;
     background: rgb(255, 219, 12);
-    width: 80px;
-    height: 50px;
+    /*width: 80px;
+    height: 50px;*/
+    width: 6.25%;
+    height: 100%;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -580,7 +609,7 @@ body {
 
 .mass p {
     position: absolute;
-    bottom: -25px;
+    bottom: -50%;
     left: 66%;
     transform: translateX(-50%);
     transform: skew(45deg);
@@ -591,8 +620,8 @@ body {
 .transparent_mass {
     border: 1px solid transparent;
     background: transparent;
-    width: 80px;
-    height: 50px;
+    width: 6.25%;
+    height: 100%;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -605,13 +634,16 @@ body {
 
 .goaltape {
     border: 1px solid black;
-    background: #000;
-    width: 30px;
-    height: 50px;
+    background: #000000;
+    /*width: 30px;
+    height: 50px;*/
+    width: 2.3%;
+    height: 39.1%;
     transform: skewX(-45deg);
     position: absolute;
     top: 0px;
-    right: 20px;
+    /*right: 20px;*/
+    right: 1.4%;
 
     display: flex;
     flex-direction: row;
@@ -619,8 +651,8 @@ body {
 }
 
 .goaltape>div {
-    width: 14px;
-    height: 9.5px;
+    width: 50%;
+    height: 20%;
 }
 
 .blacktape {
@@ -644,18 +676,6 @@ body {
     width: 15%;
     height: auto;
     position: relative;
-}
-
-.a {
-    position: absolute;
-    bottom: -100px;
-    left: -100px;
-}
-
-.b {
-    position: absolute;
-    left: -187px;
-    bottom: -66px;
 }
 
 .command_place {
@@ -682,6 +702,8 @@ body {
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
+    background-color: transparent;
+    border: 1px solid transparent;
 }
 
 .command button:hover {
