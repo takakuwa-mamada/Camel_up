@@ -182,13 +182,13 @@ async function game(){
     setCamel();
     console.log("setCamel");
     var cams = [];
-    cams.push([redCam.space, redCam.layer]);
-    cams.push([blueCam.space, blueCam.layer]);
-    cams.push([greenCam.space, greenCam.layer]);
-    cams.push([yellowCam.space, yellowCam.layer]);
-    cams.push([purpleCam.space, purpleCam.layer]);
-    cams.push([whiteCam.space, whiteCam.layer]);
-    cams.push([blackCam.space, blackCam.layer]);
+    cams.push([redCam.location, redCam.layer]);
+    cams.push([blueCam.location, blueCam.layer]);
+    cams.push([greenCam.location, greenCam.layer]);
+    cams.push([yellowCam.location, yellowCam.layer]);
+    cams.push([purpleCam.location, purpleCam.layer]);
+    cams.push([whiteCam.location, whiteCam.layer]);
+    cams.push([blackCam.location, blackCam.layer]);
     sendDataToAll("setCamel", cams);
 
     //レグのループ
