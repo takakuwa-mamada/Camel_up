@@ -25,7 +25,8 @@ const io = new Server(server);
 
 
 let socket;     //テスト用
-
+let rooms = {}; // 各ルーム情報を保持
+const playerNameMap = new Map(); // socket.id と名前を紐付ける
 
 const PORT = 4000;
 app.use(express.static('public'));
@@ -166,29 +167,31 @@ let SPM = 0;  //手番プレイヤー
 
 
 //ゲーム全体の実行
-async function game(){
-
+async function game(name,ID){
+    const keys = Array.from(ID.keys()); 
+    console.log(ID);
     //プレイヤーの追加(４人)
-    playerJoin();
+    playerJoin(name,keys);
 
     console.log("gameStart");
     var pData=[];
     for(let i=0; i<4; i++){
-        pData.push([players[i].name, players[i].ID, players[i].order])
+        pData.push([players[i].name, keys[i], players[i].order])
     }
+    console.log(pData);
     sendDataToAll("gameStart", pData);
 
     //競争ラクダの配置
     setCamel();
     console.log("setCamel");
     var cams = [];
-    cams.push([redCam.space, redCam.layer]);
-    cams.push([blueCam.space, blueCam.layer]);
-    cams.push([greenCam.space, greenCam.layer]);
-    cams.push([yellowCam.space, yellowCam.layer]);
-    cams.push([purpleCam.space, purpleCam.layer]);
-    cams.push([whiteCam.space, whiteCam.layer]);
-    cams.push([blackCam.space, blackCam.layer]);
+    cams.push([redCam.location, redCam.layer]);
+    cams.push([blueCam.location, blueCam.layer]);
+    cams.push([greenCam.location, greenCam.layer]);
+    cams.push([yellowCam.location, yellowCam.layer]);
+    cams.push([purpleCam.location, purpleCam.layer]);
+    cams.push([whiteCam.location, whiteCam.layer]);
+    cams.push([blackCam.location, blackCam.layer]);
     sendDataToAll("setCamel", cams);
 
     //レグのループ
@@ -244,22 +247,25 @@ async function game(){
     ranking();
 }
 
-
-
-function playerJoin(){
-    const P1 = new player("Tom"); players.push(P1);
+function playerJoin(name,id){ 
+    
+    const P1 = new player(name[0]); players.push(P1);
+    P1.ID = id[0]
     const tileP1 = new tile(P1); tiles.push(tileP1); P1.tile = tileP1;
     P1.order = 0;
-
-    const P2 = new player("Bob"); players.push(P2);
+    
+    const P2 = new player(name[1]); players.push(P2);
+    P2.ID = id[1]
     const tileP2 = new tile(P2); tiles.push(tileP2); P2.tile = tileP2;
     P2.order = 1;
 
-    const P3 = new player("Jhon"); players.push(P3);
+    const P3 = new player(name[2]); players.push(P3);
+    P3.ID = id[2]
     const tileP3 = new tile(P3); tiles.push(tileP3); P3.tile = tileP3;
     P3.order = 2;
 
-    const P4 = new player("Mike"); players.push(P4);
+    const P4 = new player(name[3]); players.push(P4);
+    P4.ID = id[3]
     const tileP4 = new tile(P4); tiles.push(tileP4); P4.tile = tileP4;
     P4.order = 3;
 }
@@ -434,13 +440,12 @@ async function leg(){
     var tickets=[];
     var data = [];
     tickets.push(legR); tickets.push(legB); tickets.push(legG); tickets.push(legY); tickets.push(legP);
-
     //プレイヤーの手番
     while(count!=5){
         console.log("***************************************");
         console.log(players[SPM].name);
         sendDataToTurnPlayer(players[SPM].ID, "yourTurn", 0);
-        sendDataToOtherPlayer("otherPlayer", players[SPM].order);
+        sendDataToOtherPlayer("otherTurn", players[SPM].order);
         const data = await receiveData();
         console.log("data--", data);
 
@@ -579,7 +584,7 @@ async function leg(){
         SPM += 1;
 
         //４番手から１番手へ
-        if(SPM==4){
+        if(SPM==players.length){
             SPM = 0;
         }
     }
@@ -810,21 +815,87 @@ function sendDataToOtherPlayer(tag, data){    //手番以外のプレイヤー�
     socket.broadcast.emit(tag, data);
 }
 
+function startGame(room) {
+    console.log(`Game started in room: ${room}`);
+    io.to(room).emit('startGame', { message: 'ゲームが開始されました！' });
+}
+
+let received_name = "";
+const name = []; // 名前を格納する配列 
+io.on("connection", (s) => {
+    socket = s;
+
+    // const player = { id: socket.id };
+    socket.on("request", (myname) => {
+        console.log(`${myname} が参加しました (ID: ${socket.id})`);
+        playerNameMap.set(socket.id, myname);
+        // 既存ルーム探索
+        let roomAssigned = false;
+        for (const room in rooms) {
+            if (rooms[room].players.length < 4) {  // 4人以下の場合参加可能
+                rooms[room].players.push({ id: socket.id, name: myname });
+                socket.join(room);
+                io.to(room).emit("updateRoom", rooms[room].players);
+                roomAssigned = true;
+                break;
+            }
+        }
+    
+        // 新規ルーム作成
+        if (!roomAssigned) {
+            const newRoom = `room-${Object.keys(rooms).length + 1}`;
+            rooms[newRoom] = { players: [{ id: socket.id, name: myname }] };
+            socket.join(newRoom);
+            io.to(newRoom).emit("updateRoom", rooms[newRoom].players);
+        }
+    
+        // ルーム内プレイヤーリストの取得
+        const room = Object.keys(rooms).find(r => rooms[r].players.some(p => p.id === socket.id));
+        if (room && rooms[room].players.length === 4) {
+            const playerNames = rooms[room].players.map(p => p.name);
+            game(playerNames,playerNameMap);  // ゲーム処理の開始
+            startGame(room);    // クライアントにゲーム開始を通知
+        }
+    });
+    
+
+    // 未完成．抜けたプレイヤーの識別ができていない．
+    socket.on("disconnect", () => {
+        const playerName = playerNameMap.get(socket.id);
+    
+        // プレイヤー情報の削除
+        if (playerName) {
+            console.log(`プレイヤー ${playerName} が退出しました (ID: ${socket.id})`);
+            playerNameMap.delete(socket.id);  // playerNameMapから削除
+        } else {
+            console.log(`対応するプレイヤー情報が見つかりませんでした (ID: ${socket.id})`);
+        }
+    
+        // ルーム内のプレイヤーを探して削除
+        for (const room in rooms) {
+            const playerIndex = rooms[room].players.findIndex(player => player.id === socket.id);
+    
+            if (playerIndex !== -1) {
+                rooms[room].players.splice(playerIndex, 1);
+                console.log(`ルーム: ${room} からプレイヤー (ID: ${socket.id}) を削除`);
+    
+                // ルームが空になった場合削除
+                if (rooms[room].players.length === 0) {
+                    delete rooms[room];
+                    console.log(`ルーム ${room} を削除`);
+                } else {
+                    // 更新情報をクライアントへ送信
+                    io.to(room).emit("updateRoom", rooms[room].players);
+                }
+                break;
+            }
+        }
+    });
+    
+    
+});
+
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-
-
-
-io.on("connection", (s) => {
-    socket = s;
-    console.log(`Player connected: ${socket.id}`);
-
-    
-    game();
-
-    // 切断時の処理
-    socket.on('disconnect', () => {
-        console.log('A user disconnected:', socket.id);
-    });
-});
+//プレイヤーの識別，
