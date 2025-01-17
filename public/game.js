@@ -2,7 +2,7 @@
 const socket = io(); // サーバー側のioと接続
 const board = document.getElementById("board");
 const drawnDiceContainer = document.getElementById("Roll_Dice");
-const chatWindow = document.getElementById("chatWindow");
+//const chatWindow = document.getElementById("chatWindow");
 
 function adjustScale() {
     const originalWidth = 1400;  // デザインの基準幅
@@ -408,8 +408,8 @@ const app = new Vue({
                 if (!targetmass) return;
 
                 var tilecolor = this.tile_color[mass_index];
-                for (let i = 0; i < 7; i++){
-                    if (tilecolor === null && (camels[i].position - 1) === mass_index){
+                for (let i = 0; i < 7; i++) {
+                    if (tilecolor === null && (camels[i].position - 1) === mass_index) {
                         tilecolor = "";
                         break;
                     }
@@ -466,8 +466,8 @@ const app = new Vue({
                     return;
                 }
                 var tilecolor = this.tile_color[mass_index];
-                for (let i = 0; i < 7; i++){
-                    if (tilecolor === null && (camels[i].position - 1) === mass_index){
+                for (let i = 0; i < 7; i++) {
+                    if (tilecolor === null && (camels[i].position - 1) === mass_index) {
                         tilecolor = "";
                         break;
                     }
@@ -763,6 +763,10 @@ const app = new Vue({
                 dicecolor = data.color;
                 dicenumber = data.num;
                 this.GetRollDice(dicecolor, dicenumber);
+                addChatMessage("がサイコロを振りました"); //あとで補足予定
+                setTimeout(() => {
+                    addChatMessage(data.color + "の" + data.num + "が出ました");
+                }, 4000);
             });
             socket.on("DiceEP", (data) => {
                 this.playercoin[data] += 1;
@@ -770,17 +774,21 @@ const app = new Vue({
             socket.on("onTile", (data) => {
                 //河野は使わないけど、ログで使うんじゃないかな
                 console.log(data);
+                addChatMessage('タイルの影響で' + 'が1コインを獲得');
             })
             socket.on("legVote", (data) => {
                 this.GetLegTicket(data);
+                addChatMessage('が' + '投票チケットを取りました');
             });
             socket.on("setTile", (data) => {
                 tileplace = data[0];
                 tilecolor = data[1];
                 this.GetTileColor(tilecolor, tileplace);
+                addChatMessage('が' + 'に' + 'カードを置きました');
             });
             socket.on("finalVote", (data) => {
                 this.GetForecast(data);
+                addChatMessage('が' + 'の予想をしました');
             });
             socket.on("gameStart", (data) => {
                 for (let i = 0; i < 4; i++) {
@@ -789,6 +797,7 @@ const app = new Vue({
                         this.myturnnumber = i;
                     }
                 }
+                addChatMessage('ゲームを開始します');
             });
             socket.on("setCamel", (data) => {
                 for (let i = 0; i < 7; i++) {
@@ -804,14 +813,17 @@ const app = new Vue({
             });
             socket.on("legStart", () => {
                 this.GetLegStart();
+                addChatMessage('レグを開始します');
             });
             socket.on("yourTurn", () => {
                 this.myturn = 1;
                 this.playerturn = this.myturnnumber;
+                addChatMessage('あなたのターンです');
             });
             socket.on("otherTurn", (data) => {
                 this.playerturn = data;
                 this.myturn = 0;
+                addChatMessage('のターンです');
             });
             socket.on("legPoint", (data) => {
                 for (let i = 0; i < 4; i++) {
@@ -869,12 +881,13 @@ function updateDrawnDice(drawnDice) {
 
 // チャットウィンドウにメッセージを追加これ参考にログ実装できるかも
 function addChatMessage(message) {
+    let chatWindow = document.getElementById("chatWindow");
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message");
     messageElement.innerText = message;
     chatWindow.appendChild(messageElement);
-
     chatWindow.scrollTop = chatWindow.scrollHeight;
+
 }
 // 接続時の処理(Vueへ移動しました．)
 // socket.on("connect", () => {
