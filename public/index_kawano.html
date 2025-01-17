@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>B3横山研  camel up</title>
+
+        <link rel="stylesheet" href="game_kawano.css">
+        <script src="index_kawano.js" defer></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    </head>
+    <body>
+        <div id="initial">
+            <div class="l-container">
+                <div class="p-fv">
+                </div>
+            </div>
+            <div class="logo">
+                <p>
+                    <font face="cursive">
+                        CAMEL UP
+                    </font>
+                </p>
+            </div>
+            <div class="tutorial">
+                <a href="https:" target="_blank" rel="noopener noreferrer">
+                    how to play
+                </a>
+            </div>
+            <div id="name_set">
+                <div class="name_input">
+                    <input type="text" id="playername" placeholder="プレイヤー名を入力" required>
+                </div>
+                <div class="login">
+                    <input type="button" id="joinButton" name="login" value="マッチング開始" onclick="SendName()">
+                </div>
+            </div>
+            <div id="loading-bg">
+                <div class="loading">
+                    <div class="circle">
+                        <span class="loading_span"><img src="camellist/redCamel.png" class="loading_camel"></span>
+                        <span class="loading_span">マ</span>
+                        <span class="loading_span">ッ</span>
+                        <span class="loading_span">チ</span>
+                        <span class="loading_span">ン</span>
+                        <span class="loading_span">グ</span>
+                        <span class="loading_span">中</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span">.</span>
+                        <span class="loading_span"><img src="camellist/blueCamel.png" class="loading_camel"></span>
+                        <span class="loading_span"><img src="camellist/yellowCamel.png" class="loading_camel"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="app">
+            <div class="backgray"></div>
+            <div>
+                <img v-if="gif" :src="gif" ref="diceGif" alt="Dice Animation" class="gif">
+            </div>
+            <div class="top">
+                <table class="point"> <!--得点欄-->
+                    <tr>
+                        <td v-if="playerturn === 0" class="turn">・</td>
+                        <td v-if="playerturn !== 0" class="turn"> </td>
+                        <td class="name">{{playername[0]}}</td>
+                        <td class="money">{{playercoin[0]}} coin</td>
+                        <td>
+                            <div class="box_hover">
+                                <img class="ticket_box" src="ticket_box.png">
+                                <span class="check">
+                                    <p class="playername">{{playername[0]}}</p>
+                                    <p class="nothave" v-if="playerticket[0].length === 0">現在は何も所持していません</p>
+                                    <div class="check_imgs">
+                                        <img class="check_img" v-if="playerticket[0].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[0]" :key="p_ticket_index" :src="playerticket[0][p_ticket_index]">
+                                    </div>
+                                </span>
+                            </div>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td v-if="playerturn === 1" class="turn">・</td>
+                        <td v-if="playerturn !== 1" class="turn"> </td>
+                        <td class="name">{{playername[1]}}</td>
+                        <td class="money">{{playercoin[1]}} coin</td>
+                        <td>
+                            <div class="box_hover">
+                                <img class="ticket_box" src="ticket_box.png">
+                                <span class="check">
+                                    <p class="playername">{{playername[1]}}</p>
+                                    <p class="nothave" v-if="playerticket[1].length === 0">現在は何も所持していません</p>
+                                    <div class="check_imgs">
+                                        <img class="check_img" v-if="playerticket[1].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[1]" :key="p_ticket_index" :src="playerticket[1][p_ticket_index]">
+                                    </div>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td v-if="playerturn === 2" class="turn">・</td>
+                        <td v-if="playerturn !== 2" class="turn"> </td>
+                        <td class="name">{{playername[2]}}</td>
+                        <td class="money">{{playercoin[2]}} coin</td>
+                        <td>
+                            <div class="box_hover">
+                                <img class="ticket_box" src="ticket_box.png">
+                                <span class="check">
+                                    <p class="playername">{{playername[2]}}</p>
+                                    <p class="nothave" v-if="playerticket[2].length === 0">現在は何も所持していません</p>
+                                    <div class="check_imgs">
+                                        <img class="check_img" v-if="playerticket[2].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[2]" :key="p_ticket_index" :src="playerticket[2][p_ticket_index]">
+                                    </div>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td v-if="playerturn === 3" class="turn">・</td>
+                        <td v-if="playerturn !== 3" class="turn"> </td>
+                        <td class="name">{{playername[3]}}</td>
+                        <td class="money">{{playercoin[3]}} coin</td>
+                        <td>
+                            <div class="box_hover">
+                                <img class="ticket_box" src="ticket_box.png">
+                                <span class="check">
+                                    <p class="playername">{{playername[3]}}</p>
+                                    <p class="nothave" v-if="playerticket[3].length === 0">現在は何も所持していません</p>
+                                    <div class="check_imgs">
+                                        <img class="check_img" v-if="playerticket[3].length !== 0" v-for="(p_ticket, p_ticket_index) in playerticket[3]" :key="p_ticket_index" :src="playerticket[3][p_ticket_index]">
+                                    </div>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </table> 
+                <div class="ticket"> <!--投票チケット欄-->
+                    <p class="boxtitle">投票チケット</p>
+                    <div class="color_ticket">
+                        <div class="red_ticket">
+                            <img v-for="(redticket, redticket_index) in tickets[0]" v-if="redticket_index === ticket_flag[0]-1" :key="redticket_index" :src="redticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[0]}}枚</p>
+                        </div>
+                        <div class="blue_ticket">
+                            <img v-for="(blueticket, blueticket_index) in tickets[1]" v-if="blueticket_index === ticket_flag[1]-1" :key="blueticket_index" :src="blueticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[1]}}枚</p>
+                        </div>
+                        <div class="green_ticket">
+                            <img v-for="(greenticket, greenticket_index) in tickets[2]" v-if="greenticket_index === ticket_flag[2]-1" :key="greenticket_index" :src="greenticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[2]}}枚</p>
+                        </div>
+                        <div class="yellow_ticket">
+                            <img v-for="(yellowticket, yellowticket_index) in tickets[3]" v-if="yellowticket_index === ticket_flag[3]-1" :key="yellowticket_index" :src="yellowticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[3]}}枚</p>
+                        </div>
+                        <div class="purple_ticket">
+                            <img v-for="(purpleticket, purpleticket_index) in tickets[4]" v-if="purpleticket_index === ticket_flag[4]-1" :key="purpleticket_index" :src="purpleticket.image" alt="ticket" class="ticket_picture">
+                            <p>残り {{ticket_flag[4]}}枚</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="dice"> <!--残りのサイコロ欄-->
+                    <p class="boxtitle">サイコロ</p>
+                    <div class="remain_dice">
+                        <img v-for="(remaindice, dice_index) in remaindices" v-if="dice_flag[dice_index] === 0" :key="dice_index" :src="remaindice.image" alt="dice" class="dice_picture">
+                    </div>
+                </div>
+                <div class="forecast"> <!--予想欄-->
+                    <div class="first_camel">
+                        <p>1位予想</p>
+                        <div class="card_count">
+                            <p class="now">イマ</p>
+                            <p class="forecast_number">{{topforecast_count}}</p>
+                            <p class="mai">マイ</p>
+                        </div>
+                    </div>
+                    <div class="lowest_camel">
+                        <p>最下位予想</p>
+                        <div class="card_count">
+                            <p class="now">イマ</p>
+                            <p class="forecast_number">{{bottomforecast_count}}</p>
+                            <p class="mai">マイ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="stage"> <!--盤面-->
+                    <div class="log"> <!--ログ-->
+                        <p>・player 1がサイコロを振りました</p>
+                        <p>・黄ラクダが2進みました</p>
+                    </div>
+                    <div class="camel_root">
+                        <!--マス目-->
+                        <div class="mass_set">
+                            <div v-for="(mass, mass_index) in cells" class="mass" :id="'mass-' + (mass_index + 1)">
+                                <p>{{mass}}</p>
+                            </div>
+                            <div v-for="(t_mass, t_mass_index) in cells" class="transparent_mass" :id="'t_mass-' + (t_mass_index + 1)" @click="SelectTile(t_mass_index)" @mouseenter="HoverTile(t_mass_index)" @mouseleave="LeaveTile(t_mass_index)">
+                            </div>
+                        </div>
+                        <div id="board"></div>
+                        <div class="goaltape">
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                            <div class="whitetape"></div>
+                            <div class="blacktape"></div>
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                            <div class="whitetape"></div>
+                            <div class="blacktape"></div>
+                            <div class="blacktape"></div>
+                            <div class="whitetape"></div>
+                        </div>
+                        <!--駒-->
+                        <img v-for="(camel, color) in camels" :key="color" class="camelsize" :id="'camel-' + color" :src="camel.image" :style="StartPosition(color)">
+                    </div>
+                    <div  class="command_place" v-if="myturn === 1">
+                        <div  v-for="(command, command_index) in commands[0]" v-if="command_flag === 0" class="command" :key="command_index">
+                            <!--<p id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</p>-->
+                            <button type="button" id="'command0-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[1]" v-if="(command_flag === 4 && forecast_flag[topbottom][command_index] === 0) || (command_flag === 1 && ticket_flag[command_index] !== 0)" class="command" :key="command_index">
+                            <!--<p @click="CommandClick(command)">{{command.word}}</p>-->
+                            <button type="button" id="'command1-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[2]" v-if="command_flag === 2" class="command" :key="command_index">
+                            <!--<p @click="CommandClick(command)">{{command.word}}</p>-->
+                            <button type="button" id="'command2-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
+                        </div>
+                        <div  v-for="(command, command_index) in commands[3]" v-if="command_flag === 3" class="command" :key="command_index">
+                            <!--<p @click="CommandClick(command)">{{command.word}}</p>-->
+                            <button type="button" id="'command3-' + command_index" @click="CommandClick(command)">{{command.word}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="result">
+            <table id="ranking">
+                <tr>
+                    <th>ranking</th>
+                    <th>name</th>
+                    <th>coin</th>
+                </tr>
+                <tr>
+                    <td id="first"></td>
+                    <td id="firstplayer_name"></td>
+                    <td id="firstplayer_coin"></td>
+                </tr>
+                <tr>
+                    <td id="second"></td>
+                    <td id="secondplayer_name"></td>
+                    <td id="secondplayer_coin"></td>
+                </tr>
+                <tr>
+                    <td id="third"></td>
+                    <td id="thirdplayer_name"></td>
+                    <td id="thirdplayer_coin"></td>
+                </tr>
+                <tr>
+                    <td id="fourth"></td>
+                    <td id="fourthplayer_name"></td>
+                    <td id="fourthplayer_coin"></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
