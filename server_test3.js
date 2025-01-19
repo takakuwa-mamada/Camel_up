@@ -551,6 +551,8 @@ async function game(room, name, ID){
                             console.log(col);
                         }
                     }
+                    var d = new dice(col, n);
+                    sendDataToAll("rollDice", d);
                 }
                 //他のダイス
                 else{
@@ -558,6 +560,8 @@ async function game(room, name, ID){
                     for(let k=0; k<camels.length; k++){
                         if(camels[k].color==col){
                             move(camels[k], n);
+                            var d = new dice(col, n);
+                            sendDataToAll("rollDice", d);
                             
                             //ゴール(16を越える)したら終了
                             if(camels[k].location==17){
@@ -566,8 +570,6 @@ async function game(room, name, ID){
                         }
                     }
                 }
-                var d = new dice(col, n);
-                sendDataToAll("rollDice", d);
                 count++;
             }
     
