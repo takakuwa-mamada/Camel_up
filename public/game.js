@@ -763,9 +763,9 @@ const app = new Vue({
                 dicecolor = data.color;
                 dicenumber = data.num;
                 this.GetRollDice(dicecolor, dicenumber);
-                addChatMessage("がサイコロを振りました"); //あとで補足予定
+                addChatMessage("がサイコロを振りました"); //[サイコロを振ったプレイヤー名]がサイコロを振りました
                 setTimeout(() => {
-                    addChatMessage(data.color + "の" + data.num + "が出ました");
+                    addChatMessage(data.color + "の" + data.num + "が出ました"); //変更なし
                 }, 4000);
             });
             socket.on("DiceEP", (data) => {
@@ -774,21 +774,21 @@ const app = new Vue({
             socket.on("onTile", (data) => {
                 //河野は使わないけど、ログで使うんじゃないかな
                 console.log(data);
-                addChatMessage('タイルの影響で' + 'が1コインを獲得');
+                addChatMessage('タイルの影響で' + 'が1コインを獲得'); //[応援 or ブーイング]タイルの影響で[タイルを置いたプレイヤー名]が1コインを獲得
             })
             socket.on("legVote", (data) => {
                 this.GetLegTicket(data);
-                addChatMessage('が' + '投票チケットを取りました');
+                addChatMessage('が' + 'の投票チケットを取りました'); //[手番のプレイヤー名]が[取られた投票チケットの色]の投票チケットを取りました
             });
             socket.on("setTile", (data) => {
                 tileplace = data[0];
                 tilecolor = data[1];
                 this.GetTileColor(tilecolor, tileplace);
-                addChatMessage('が' + 'に' + 'カードを置きました');
+                addChatMessage('が' + 'に' + 'カードを置きました'); //[タイルを置いたプレイヤー名]が[タイルを置いた場所]に[応援 or ブーイング]カードを置きました
             });
             socket.on("finalVote", (data) => {
                 this.GetForecast(data);
-                addChatMessage('が' + 'の予想をしました');
+                addChatMessage('が' + 'の予想をしました'); //[手番のプレイヤー]が[1位 or 最下位]の予想をしました
             });
             socket.on("gameStart", (data) => {
                 for (let i = 0; i < 4; i++) {
@@ -823,7 +823,7 @@ const app = new Vue({
             socket.on("otherTurn", (data) => {
                 this.playerturn = data;
                 this.myturn = 0;
-                addChatMessage('のターンです');
+                addChatMessage('のターンです'); //[手番の人]のターンです
             });
             socket.on("legPoint", (data) => {
                 for (let i = 0; i < 4; i++) {
