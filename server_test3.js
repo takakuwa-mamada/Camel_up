@@ -1,20 +1,3 @@
-//version 2.0.0
-/*
-「」はフローチャートに対応
-
---1.4.0までに実装した機能--
-・ゲーム進行の処理（勝者判定以外）
-
-
---2.0.0で実装した機能--
-・通信機能
-・勝者判定
-
---未実装の機能--
-・プレイヤーの参加
-・ゲームの開始
-*/
-
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
@@ -520,6 +503,8 @@ async function game(room, name, ID){
     
                 //出たダイスの処理
                 restDice.splice(c,1);
+                var d = new dice(col, n);
+                sendDataToAll("rollDice", d);
                 
                 //灰ダイス時
                 if(col=="gray"){
@@ -566,8 +551,6 @@ async function game(room, name, ID){
                         }
                     }
                 }
-                var d = new dice(col, n);
-                sendDataToAll("rollDice", d);
                 count++;
             }
     
