@@ -6,6 +6,8 @@ body {
     background-color: #f2af1e;
     overflow: hidden;
     background-size: cover;
+    width: 100vw;
+    height: 100vh;
 }
 
 #initial {
@@ -338,7 +340,7 @@ body {
     align-items: flex-start;
     /*margin-top: 30px;*/
     margin-top: 4vh;
-    height: 16.5vh;
+    height: 16.5%;
 }
 
 .point {
@@ -346,7 +348,7 @@ body {
     /*width: 250px;*/
     /*height: 120px;*/
     width: 18%;
-    height: 100%;
+    height: 120px;
     /*border: solid 1px #000;*/
     text-align: center;
     background: rgba(70, 206, 244, 0.3);
@@ -422,7 +424,7 @@ body {
     /*width: 400px;
     height: 120px;*/
     width: 28.8%;
-    height: 100%;
+    height: 120px;
     border: solid 1px rgba(3, 114, 145, 0.1);
     background: rgba(70, 206, 244, 0.3);
 
@@ -457,7 +459,7 @@ body {
 .color_ticket>div p {
     position: absolute;
     /*top: 80px;*/
-    top: 11vh;
+    bottom: 2px;
     font-size: small;
 }
 
@@ -485,7 +487,7 @@ body {
     /*width: 150px;
     height: 120px;*/
     width: 10.8%;
-    height: 100%;
+    height: 120px;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -515,7 +517,7 @@ body {
     /*width: 300px;
     height: 120px;*/
     width: 21.6%;
-    height: 100%;
+    height: 120px;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -614,7 +616,7 @@ body {
     /*width: 80px;
     height: 50px;*/
     width: 6.25%;
-    height: 100%;
+    height: 50px;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -638,7 +640,7 @@ body {
     border: 1px solid transparent;
     background: transparent;
     width: 6.25%;
-    height: 100%;
+    height: 50px;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -655,7 +657,7 @@ body {
     /*width: 30px;
     height: 50px;*/
     width: 2.3%;
-    height: 39.1%;
+    height: 50px;
     transform: skewX(-45deg);
     position: absolute;
     top: 0px;
