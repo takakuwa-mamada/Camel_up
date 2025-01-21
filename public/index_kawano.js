@@ -33,8 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
 let myname = "";
 function SendName() {
     myname = document.getElementById("playername").value;
-    if (myname.length === 0) {
-        alert("名前は1文字以上記入してください");
+    if (myname.length === 0 || 15 < myname.length) {
+        alert("名前は1文字以上15文字以下で記入してください");
     }
     else {
         console.log(myname + "が参加しました。");
@@ -771,11 +771,13 @@ const app = new Vue({
                 addChatMessage(this.playername[this.playerturn] + "　がサイコロを振りました"); //[サイコロを振ったプレイヤー名]がサイコロを振りました
                 addChatMessage(this.playername[this.playerturn] + "　が1コイン獲得します");
                 var col;
-                if (dicecolor == 0) col = "赤";
-                else if (dicecolor == 1) col = "青";
-                else if (dicecolor == 2) col = "緑";
-                else if (dicecolor == 3) col = "黄";
-                else if (dicecolor == 4) col = "紫";
+                if (dicecolor == "red") col = "赤";
+                else if (dicecolor == "blue") col = "青";
+                else if (dicecolor == "green") col = "緑";
+                else if (dicecolor == "yellow") col = "黄";
+                else if (dicecolor == "purple") col = "紫";
+                else if (dicecolor == "white") col = "白";
+                else if (dicecolor == "black") col = "黒";
                 setTimeout(() => {
                     addChatMessage(col + "　の" + data.num + "が出ました"); //変更なし
                 }, 4000);
