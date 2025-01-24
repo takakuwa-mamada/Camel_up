@@ -1,10 +1,13 @@
 @import url(destyle.css);
 
 body {
+    resize: none;
     background-image: url(desert.png);
     background-color: #f2af1e;
     overflow: hidden;
     background-size: cover;
+    width: 100vw;
+    height: 100vh;
 }
 
 #initial {
@@ -12,6 +15,17 @@ body {
 }
 
 #app {
+    display: none;
+}
+
+#result {
+    position: absolute;
+    width: 80vw;
+    height: auto;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
     display: none;
 }
 
@@ -296,7 +310,6 @@ body {
         transform: rotate(585deg);
     }
 }
-
 /*ここまでローディング部分*/
 
 .backgray {
@@ -327,14 +340,15 @@ body {
     align-items: flex-start;
     /*margin-top: 30px;*/
     margin-top: 4vh;
-    height: 16.5vh;
+    height: 16.5%;
 }
 
 .point {
+    resize: none;
     /*width: 250px;*/
     /*height: 120px;*/
     width: 18%;
-    height: 100%;
+    height: 120px;
     /*border: solid 1px #000;*/
     text-align: center;
     background: rgba(70, 206, 244, 0.3);
@@ -410,7 +424,7 @@ body {
     /*width: 400px;
     height: 120px;*/
     width: 28.8%;
-    height: 100%;
+    height: 120px;
     border: solid 1px rgba(3, 114, 145, 0.1);
     background: rgba(70, 206, 244, 0.3);
 
@@ -445,7 +459,7 @@ body {
 .color_ticket>div p {
     position: absolute;
     /*top: 80px;*/
-    top: 11vh;
+    bottom: 2px;
     font-size: small;
 }
 
@@ -473,7 +487,7 @@ body {
     /*width: 150px;
     height: 120px;*/
     width: 10.8%;
-    height: 100%;
+    height: 120px;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -503,7 +517,7 @@ body {
     /*width: 300px;
     height: 120px;*/
     width: 21.6%;
-    height: 100%;
+    height: 120px;
     background: rgba(70, 206, 244, 0.3);
     border: solid 1px rgba(3, 114, 145, 0.1);
     display: flex;
@@ -587,6 +601,7 @@ body {
 }
 
 .camel_root {
+    resize: none;
     margin: 0 auto;
     margin-top: 5%;
     width: 95%;
@@ -596,17 +611,19 @@ body {
 }
 
 .mass_set {
+    resize: none;
     width: 96.3%;
     height: 39.1%;
 }
 
 .mass {
+    resize: none;
     border: 1px solid black;
     background: rgb(255, 219, 12);
     /*width: 80px;
     height: 50px;*/
     width: 6.25%;
-    height: 100%;
+    height: 50px;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -616,6 +633,7 @@ body {
 }
 
 .mass p {
+    resize: none;
     position: absolute;
     bottom: -50%;
     left: 66%;
@@ -629,7 +647,7 @@ body {
     border: 1px solid transparent;
     background: transparent;
     width: 6.25%;
-    height: 100%;
+    height: 50px;
     transform: skewX(-45deg);
     display: inline-block;
     text-align: center;
@@ -646,7 +664,7 @@ body {
     /*width: 30px;
     height: 50px;*/
     width: 2.3%;
-    height: 39.1%;
+    height: 50px;
     transform: skewX(-45deg);
     position: absolute;
     top: 0px;
@@ -680,7 +698,11 @@ body {
     filter: drop-shadow(7px -5px 0px rgba(0, 0, 0, 0.2));
 }
 
-
+.log img {
+    width: 15%;
+    height: auto;
+    position: relative;
+}
 
 .command_place {
     background-color: rgba(138, 138, 138, 0.6);
@@ -712,4 +734,18 @@ body {
 
 .command button:hover {
     color: #fcff9f;
+}
+
+#ranking {
+    width: 100%;
+    height: auto;
+    border-collapse:  collapse;
+    background-color: rgba(0, 255, 242, 0.8);
+}
+
+#ranking th, #ranking td{
+    border: solid 1px #000;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 300%;
 }
